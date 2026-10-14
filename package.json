@@ -1,0 +1,33 @@
+{
+  "name": "smart-hub-gh",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "node scripts/build.mjs",
+    "preview": "vite preview",
+    "predev": "node scripts/optimize-images.mjs",
+    "prebuild": "node scripts/optimize-images.mjs",
+    "check": "tsc --noEmit",
+    "verify:build": "node scripts/verify-build.mjs"
+  },
+  "dependencies": {
+    "framer-motion": "^12.43.0",
+    "lucide-react": "^0.562.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "react-router-dom": "^7.18.4"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "4.3.3",
+    "@types/node": "^22.14.0",
+    "@vitejs/plugin-react": "^5.2.0",
+    "autoprefixer": "10.6.1",
+    "postcss": "8.5.29",
+    "sharp": "0.35.5",
+    "tailwindcss": "4.3.3",
+    "typescript": "~5.8.2",
+    "vite": "^6.4.4"
+  }
+}

@@ -1,0 +1,16 @@
+# robots.txt for SMART HUB GH
+User-agent: *
+Allow: /
+
+# Block access to source files and sensitive directories
+Disallow: /node_modules/
+Disallow: /.git/
+Disallow: /.env
+Disallow: /dist.zip
+Disallow: /*.ts$
+Disallow: /*.tsx$
+Disallow: /*.sh$
+Disallow: /*.bat$
+
+# Sitemap
+Sitemap: https://wilsontenk.github.io/smarthubgh/sitemap.xml
