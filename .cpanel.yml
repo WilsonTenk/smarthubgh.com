@@ -1,0 +1,7 @@
+---
+deployment:
+  tasks:
+    - /usr/bin/test -s dist/index.html
+    - /usr/bin/test -d dist/assets
+    - /usr/bin/test -s dist/.htaccess
+    - /bin/chmod -R u=rwX,go=rX dist

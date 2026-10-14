@@ -1,0 +1,43 @@
+# Apache 2.4 / cPanel. Deploy the CONTENTS of dist, including this hidden file.
+Options -Indexes -MultiViews
+DirectoryIndex index.html
+ErrorDocument 404 /404.html
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule (^|/)\.(?!well-known(?:/|$)) - [F,L]
+  RewriteRule ^\.well-known/acme-challenge/ - [L]
+  RewriteCond %{HTTP_HOST} ^www\.smarthubgh\.com$ [NC]
+  RewriteRule ^ https://smarthubgh.com%{REQUEST_URI} [R=301,L,NE]
+  RewriteCond %{HTTP_HOST} ^smarthubgh\.com$ [NC]
+  RewriteCond %{HTTPS} !=on
+  RewriteCond %{HTTP:X-Forwarded-Proto} !https [NC]
+  RewriteRule ^ https://smarthubgh.com%{REQUEST_URI} [R=301,L,NE]
+</IfModule>
+
+<IfModule mod_headers.c>
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'sha256-5edXSVaicIfa7JoCyaF7lAO5X8FgZypszJyY6GrmCkc='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'"
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+  Header always set Strict-Transport-Security "max-age=31536000" "expr=%{HTTPS} == 'on'"
+  <FilesMatch "\.(?:html|xml|txt)$">
+    Header set Cache-Control "public, max-age=0, must-revalidate"
+  </FilesMatch>
+  <FilesMatch "\.(?:webp|jpe?g|png|svg|woff2)$">
+    Header set Cache-Control "public, max-age=604800"
+  </FilesMatch>
+  <FilesMatch "^[a-zA-Z0-9_-]+-[a-zA-Z0-9_-]{8}\.(?:js|css)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+</IfModule>
+
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/css text/javascript application/javascript application/json application/ld+json application/xml image/svg+xml
+</IfModule>
+
+# Deployment contains public build files only; also deny common source/secret names.
+<FilesMatch "(?i)^(?:\..*|package(?:-lock)?\.json|.*\.(?:pem|key|map)|vite\.config\..*|tsconfig\.json)$">
+  Require all denied
+</FilesMatch>

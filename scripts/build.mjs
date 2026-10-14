@@ -12,7 +12,7 @@ const outDir = path.resolve(root, outArg >= 0 ? args[outArg + 1] : 'dist');
 if (args.some(arg => !['--outDir', '--emptyOutDir', args[outArg + 1]].includes(arg))) throw new Error('Unsupported build argument');
 await build({ root, build: { outDir, emptyOutDir: true } });
 
-const template = await readFile(path.join(outDir, 'index.html'), 'utf8');
+const template = (await readFile(path.join(outDir, 'index.html'), 'utf8')).split('\n').map(line => line.trimEnd()).join('\n');
 const bootstrap = template.match(/<script>([\s\S]*?)<\/script>/)?.[1];
 if (!bootstrap || !template.includes('<div id="root"></div>')) throw new Error('Unexpected HTML template');
 const hash = createHash('sha256').update(bootstrap).digest('base64');

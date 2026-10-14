@@ -1,0 +1,5 @@
+Plus Jakarta Sans variable font, weights 200–800.
+Downloaded from the official Google Fonts stylesheets and fonts.gstatic.com.
+Source stylesheet: https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200..800&display=swap
+License: https://raw.githubusercontent.com/google/fonts/main/ofl/plusjakartasans/OFL.txt
+See OFL.txt for SIL Open Font License terms.
