@@ -28,17 +28,17 @@ const Projects: React.FC = () => {
           {sortProjectsNewestFirst(projectsData).map((project, index) => (
             <AnimatedSection key={project.id} direction="up" delay={index * 0.1} className="h-full">
               <div className="group bg-white dark:bg-slate-900 ui-card overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-white/5 flex flex-col h-full">
-                <div className="ui-card-media relative h-52 md:h-64">
+                <div className="ui-card-media ui-project-media relative">
                    <BlogCover post={project} />
                    <div className="absolute top-4 left-4">
-                      <span className="bg-brand-blue text-white ui-badge shadow-lg">
+                      <span className="bg-white/95 dark:bg-brand-navy/95 text-brand-navy dark:text-white ui-badge shadow-sm">
                         {project.sponsor}
                       </span>
                    </div>
                 </div>
 
                 <div className="p-6 md:p-7 flex flex-col flex-grow">
-                   <h3 className="font-black text-xl md:text-2xl text-brand-navy dark:text-white mb-4 leading-tight uppercase tracking-tight line-clamp-2">
+                   <h3 className="font-black text-xl md:text-2xl text-brand-navy dark:text-white mb-3 leading-tight tracking-tight line-clamp-2">
                      {project.title}
                    </h3>
                    <div className="flex flex-wrap gap-3 mb-4">

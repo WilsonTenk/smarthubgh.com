@@ -66,7 +66,7 @@ const Home: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
             {featuredProjects.map((project, i) => (
               <AnimatedSection key={project.id} direction="up" delay={i * 0.1} className="group flex flex-col h-full bg-white dark:bg-slate-900 ui-card overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 border border-slate-100 dark:border-white/5">
-                <div className="ui-card-media h-[250px] md:h-[350px] relative">
+                <div className="ui-card-media ui-project-media relative">
                   <BlogCover post={project} />
                   <div className="absolute top-4 left-4">
                     <span className="bg-white/95 dark:bg-brand-navy/95 text-brand-navy dark:text-white ui-badge shadow-sm">

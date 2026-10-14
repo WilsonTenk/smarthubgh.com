@@ -38,7 +38,7 @@ const Blog: React.FC = () => {
                       {(post.updatedAt || post.date) && <span className="flex items-center gap-1"><Calendar size={14} className="text-brand-green" /> {post.updatedAt ? `Updated ${post.updatedAt}` : post.date}</span>}
                       <span className="flex items-center gap-1"><User size={14} className="text-brand-green" /> {post.author}</span>
                    </div>
-                   <h3 className="text-xl font-black text-brand-navy dark:text-white uppercase mb-3 tracking-tight line-clamp-2 hover:text-brand-blue transition-colors">
+                   <h3 className="text-xl font-black text-brand-navy dark:text-white mb-3 tracking-tight line-clamp-2 hover:text-brand-blue transition-colors">
                      <Link to={`/blog/${post.id}`}>
                        {post.title}
                      </Link>

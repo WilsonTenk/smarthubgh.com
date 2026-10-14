@@ -91,7 +91,7 @@ const About: React.FC = () => {
               { label: "Active Volunteers", value: 35, suffix: "+", icon: <CheckCircle2 className="text-brand-green" /> }
             ].map((stat, i) => (
               <AnimatedSection key={i} direction="up" delay={i * 0.1} className="bg-white/5 p-4 sm:p-6 ui-card border border-white/10 text-center flex flex-col items-center">
-                <div className="ui-icon-placeholder">
+                <div className="ui-icon-placeholder mb-4">
                   {stat.icon}
                 </div>
                 <div className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tighter mb-2 leading-none">

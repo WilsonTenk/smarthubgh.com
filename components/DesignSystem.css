@@ -64,3 +64,6 @@
 @media (min-width: 768px) { .portrait-frame-profile { width: 40%; max-width: 280px; margin: 16px; align-self: center; } }
 @media (max-width: 540px) { .ui-button { gap: 13px; font-size: 12px; padding-left: 15px; } }
 @media (prefers-reduced-motion: reduce) { .ui-button { transition: none; } .ui-button:hover { transform: none; } }
+
+.ui-project-media { height: 250px; }
+@media (min-width: 768px) { .ui-project-media { height: 350px; } }
