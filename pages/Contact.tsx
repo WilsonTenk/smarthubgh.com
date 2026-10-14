@@ -23,7 +23,7 @@ const Contact: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 items-start">
           
           <div className="order-2 lg:order-1">
-             <AnimatedSection direction="right" className="bg-brand-blue rounded-2xl p-6 md:p-8 text-white relative overflow-hidden shadow-sm">
+             <AnimatedSection direction="right" className="bg-brand-blue ui-card p-6 md:p-8 text-white relative overflow-hidden shadow-sm">
                 <div className="relative z-10">
                    <div className="flex items-center gap-4 mb-6">
                      <Heart className="text-brand-green" size={28} fill="currentColor" />
@@ -52,7 +52,7 @@ const Contact: React.FC = () => {
                    <h3 className="font-black text-lg md:text-xl uppercase mb-4 tracking-tight">Other Contributions</h3>
                    <div className="flex flex-wrap gap-2">
                       {["School Materials", "Sanitary Kits", "Tech Devices"].map(item => (
-                        <span key={item} className="px-4 py-2 bg-white/5 rounded-full border border-white/10 text-[9px] font-black uppercase tracking-widest">
+                        <span key={item} className="ui-badge bg-white/5 border border-white/10">
                           {item}
                         </span>
                       ))}
@@ -66,8 +66,8 @@ const Contact: React.FC = () => {
               <h2 className="font-black text-2xl md:text-4xl text-brand-navy dark:text-white uppercase mb-6 tracking-tighter transition-colors">Get In Touch</h2>
               
               <div className="grid grid-cols-1 gap-4 md:gap-5">
-                <div className="group flex items-start gap-4 p-5 md:p-6 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-white/5 shadow-sm transition-all duration-300">
-                  <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-brand-light dark:bg-white/5 shadow-inner flex items-center justify-center shrink-0 text-brand-navy dark:text-brand-blue group-hover:bg-brand-blue group-hover:text-white transition-all duration-300">
+                <div className="group flex items-start gap-4 p-5 md:p-6 bg-white dark:bg-slate-900 ui-card border border-slate-100 dark:border-white/5 shadow-sm transition-all duration-300">
+                  <div className="ui-icon-placeholder">
                     <MapPin size={24} />
                   </div>
                   <div>
@@ -77,8 +77,8 @@ const Contact: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="group flex items-start gap-4 p-5 md:p-6 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-white/5 shadow-sm transition-all duration-300">
-                  <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-brand-light dark:bg-white/5 shadow-inner flex items-center justify-center shrink-0 text-brand-navy dark:text-brand-blue group-hover:bg-brand-blue group-hover:text-white transition-all duration-300">
+                <div className="group flex items-start gap-4 p-5 md:p-6 bg-white dark:bg-slate-900 ui-card border border-slate-100 dark:border-white/5 shadow-sm transition-all duration-300">
+                  <div className="ui-icon-placeholder">
                     <Phone size={24} />
                   </div>
                   <div>
@@ -88,8 +88,8 @@ const Contact: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="group flex items-start gap-4 p-5 md:p-6 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-white/5 shadow-sm transition-all duration-300">
-                  <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-brand-light dark:bg-white/5 shadow-inner flex items-center justify-center shrink-0 text-brand-navy dark:text-brand-blue group-hover:bg-brand-blue group-hover:text-white transition-all duration-300">
+                <div className="group flex items-start gap-4 p-5 md:p-6 bg-white dark:bg-slate-900 ui-card border border-slate-100 dark:border-white/5 shadow-sm transition-all duration-300">
+                  <div className="ui-icon-placeholder">
                     <Mail size={24} />
                   </div>
                   <div className="min-w-0">

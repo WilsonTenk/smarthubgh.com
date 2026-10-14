@@ -7,7 +7,8 @@ import { AnimatedSection } from '../components/AnimatedSection';
 import { leadershipData, partnersData } from '../data';
 import { Users, Globe, Layers, CheckCircle2, X } from 'lucide-react';
 import { LeadershipMember } from '../types';
-import { getResponsiveImageProps } from '../utils/responsiveImage';
+import PortraitFrame from '../components/PortraitFrame';
+import { IconButton } from '../components/Action';
 import CountUp from '../components/CountUp';
 import PartnerMarquee from '../components/PartnerMarquee';
 
@@ -57,14 +58,14 @@ const About: React.FC = () => {
       {/* Vision & Mission */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
-          <AnimatedSection direction="right" className="bg-slate-50 dark:bg-slate-900/50 p-6 md:p-8 rounded-2xl border border-slate-100 dark:border-white/5 transition-colors">
+          <AnimatedSection direction="right" className="bg-slate-50 dark:bg-slate-900/50 p-6 md:p-8 ui-card border border-slate-100 dark:border-white/5 transition-colors">
             <h2 className="text-xl md:text-2xl font-black text-brand-navy dark:text-white uppercase mb-4 tracking-tight">Our Vision</h2>
             <p className="text-base md:text-lg font-medium text-slate-600 dark:text-slate-400 leading-relaxed">
               A future of competent, healthy and like-minded people making Ghana a premier nation.
             </p>
           </AnimatedSection>
 
-          <AnimatedSection direction="right" delay={0.1} className="bg-brand-blue p-6 md:p-8 rounded-2xl text-white shadow-sm">
+          <AnimatedSection direction="right" delay={0.1} className="bg-brand-blue p-6 md:p-8 ui-card text-white shadow-sm">
             <h2 className="text-xl md:text-2xl font-black uppercase mb-4 tracking-tight">Our Mission</h2>
             <p className="text-base md:text-lg font-medium leading-relaxed text-white/90">
               To impact the Ghanaian society through education, capacity building and advocacy in child protection, adolescents and reproductive health.
@@ -89,8 +90,8 @@ const About: React.FC = () => {
               { label: "Communities Reached", value: 30, suffix: "+", icon: <Globe className="text-brand-blue" /> },
               { label: "Active Volunteers", value: 35, suffix: "+", icon: <CheckCircle2 className="text-brand-green" /> }
             ].map((stat, i) => (
-              <AnimatedSection key={i} direction="up" delay={i * 0.1} className="bg-white/5 p-4 sm:p-6 rounded-2xl border border-white/10 text-center flex flex-col items-center">
-                <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center mb-4">
+              <AnimatedSection key={i} direction="up" delay={i * 0.1} className="bg-white/5 p-4 sm:p-6 ui-card border border-white/10 text-center flex flex-col items-center">
+                <div className="ui-icon-placeholder">
                   {stat.icon}
                 </div>
                 <div className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tighter mb-2 leading-none">
@@ -123,7 +124,7 @@ const About: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-16 items-center">
             <AnimatedSection direction="right">
-              <div className="bg-white dark:bg-slate-900 p-6 md:p-8 rounded-2xl shadow-sm border border-slate-100 dark:border-white/5 transition-colors">
+              <div className="bg-white dark:bg-slate-900 p-6 md:p-8 ui-card shadow-sm border border-slate-100 dark:border-white/5 transition-colors">
                 <h3 className="text-xl md:text-2xl font-black text-brand-navy dark:text-white mb-6 uppercase tracking-tight">Identity & Values</h3>
                 <div className="space-y-5 md:space-y-6">
                   {[
@@ -176,10 +177,8 @@ const About: React.FC = () => {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
             {leadershipData.map((leader, idx) => (
               <AnimatedSection key={idx} direction="up" delay={idx * 0.1} className="text-center">
-                <button type="button" onClick={() => setSelectedLeader(leader)} aria-haspopup="dialog" aria-label={`View ${leader.name}'s profile`} className="w-full text-center rounded-2xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-blue">
-                  <div className="relative rounded-2xl overflow-hidden mb-4 aspect-[3/4] bg-slate-100 dark:bg-slate-900 shadow-sm">
-                    <img {...getResponsiveImageProps(leader.image, '(min-width: 1024px) 280px, 45vw')} alt={leader.name} loading="lazy" decoding="async" className="w-full h-full object-contain object-top" />
-                  </div>
+                <button type="button" onClick={() => setSelectedLeader(leader)} aria-haspopup="dialog" aria-label={`View ${leader.name}'s profile`} className="ui-profile-trigger">
+                  <div className="mb-4"><PortraitFrame src={leader.image} name={leader.name} /></div>
                   <h4 className="text-base md:text-lg font-black text-brand-navy dark:text-white uppercase tracking-tight">{leader.name}</h4>
                   <p className="text-brand-blue font-black uppercase text-[9px] md:text-[10px] tracking-[0.2em] mt-1">{leader.role}</p>
                   {leader.occupation && <p className="text-slate-500 dark:text-slate-400 text-xs font-medium mt-1">{leader.occupation}</p>}
@@ -208,20 +207,11 @@ const About: React.FC = () => {
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="leader-profile-title"
-                className="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-3xl overflow-hidden shadow-2xl relative flex flex-col md:flex-row max-h-[90svh] md:h-[min(560px,90svh)]"
+                className="bg-white dark:bg-slate-900 ui-card w-full max-w-3xl overflow-hidden shadow-2xl relative flex flex-col md:flex-row max-h-[90svh] md:h-[min(560px,90svh)]"
                 onClick={(e) => e.stopPropagation()}
               >
-                <button 
-                  type="button"
-                  onClick={() => setSelectedLeader(null)}
-                  aria-label="Close leadership profile"
-                  className="absolute top-4 right-4 z-10 p-2 bg-black/50 hover:bg-black/70 rounded-full text-white transition-colors"
-                >
-                  <X size={20} />
-                </button>
-                <div className="w-full md:w-2/5 h-[min(32svh,288px)] md:h-auto shrink-0 relative bg-slate-100 dark:bg-slate-950">
-                  <img {...getResponsiveImageProps(selectedLeader.image, '(min-width: 768px) 308px, 90vw')} alt={selectedLeader.name} decoding="async" className="w-full h-full md:absolute md:inset-0 object-contain object-top" />
-                </div>
+                <IconButton onClick={() => setSelectedLeader(null)} aria-label="Close leadership profile" className="ui-icon-button-overlay absolute top-4 right-4 z-10"><X size={20} /></IconButton>
+                <PortraitFrame src={selectedLeader.image} name={selectedLeader.name} profile />
                 <div className="p-6 md:p-8 flex-1 min-h-0 overflow-y-auto">
                   <h3 id="leader-profile-title" className="text-2xl md:text-3xl font-black text-brand-navy dark:text-white uppercase tracking-tight mb-2">{selectedLeader.name}</h3>
                   <div className="mb-6 flex flex-col gap-1">

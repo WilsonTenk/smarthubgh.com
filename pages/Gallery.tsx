@@ -53,7 +53,7 @@ const Gallery: React.FC = () => {
         <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
           {allImages.map((item, idx) => (
             <AnimatedSection key={idx} direction="up" delay={Math.min(idx * 0.03, 0.5)} className="break-inside-avoid">
-              <div className="relative group rounded-2xl overflow-hidden shadow-sm border border-slate-100 dark:border-white/5">
+              <div className="ui-media relative group shadow-sm border border-slate-100 dark:border-white/5">
                 <img
                   {...getResponsiveImageProps(item.src, '(min-width: 1024px) 400px, (min-width: 768px) 45vw, 100vw')}
                   alt={item.alt}

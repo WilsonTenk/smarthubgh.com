@@ -58,18 +58,18 @@ const Home: React.FC = () => {
               <h2 id="recent-projects-heading" className="text-4xl md:text-7xl text-brand-navy dark:text-white font-black tracking-tighter uppercase">Recent <span className="text-brand-blue">Projects</span></h2>
               <p className="text-slate-400 dark:text-slate-500 mt-2 text-base md:text-xl font-medium">Our latest work in the communities we serve.</p>
             </AnimatedSection>
-            <Link to="/projects" className="flex items-center gap-3 font-black uppercase tracking-[0.2em] text-brand-navy dark:text-white hover:text-brand-blue transition-all text-xs md:text-sm group">
+            <Link to="/projects" className="ui-text-link group">
               All Projects <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
             {featuredProjects.map((project, i) => (
-              <AnimatedSection key={project.id} direction="up" delay={i * 0.1} className="group flex flex-col h-full bg-white dark:bg-slate-900 rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 border border-slate-100 dark:border-white/5">
-                <div className="h-[250px] md:h-[350px] overflow-hidden relative">
+              <AnimatedSection key={project.id} direction="up" delay={i * 0.1} className="group flex flex-col h-full bg-white dark:bg-slate-900 ui-card overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 border border-slate-100 dark:border-white/5">
+                <div className="ui-card-media h-[250px] md:h-[350px] relative">
                   <BlogCover post={project} />
                   <div className="absolute top-4 left-4">
-                    <span className="bg-white/95 dark:bg-brand-navy/95 text-brand-navy dark:text-white text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] px-4 py-2 rounded-lg shadow-sm">
+                    <span className="bg-white/95 dark:bg-brand-navy/95 text-brand-navy dark:text-white ui-badge shadow-sm">
                       {project.sponsor}
                     </span>
                   </div>
@@ -82,7 +82,7 @@ const Home: React.FC = () => {
                     {project.description}
                   </p>
                   <div className="flex flex-wrap justify-between items-center gap-3 mt-auto pt-4 border-t border-slate-100 dark:border-white/5">
-                    <Link to={`/projects/${project.id}`} className="text-brand-blue font-black text-xs md:text-sm uppercase tracking-widest hover:text-brand-navy dark:hover:text-white transition-colors flex items-center gap-2">
+                    <Link to={`/projects/${project.id}`} className="ui-text-link">
                       Read Case Study <ArrowRight size={16} />
                     </Link>
                     <span className="text-[9px] md:text-[10px] font-black text-slate-300 dark:text-slate-700 uppercase tracking-widest">{project.period}</span>
@@ -104,18 +104,18 @@ const Home: React.FC = () => {
               </h2>
               <p className="text-slate-400 dark:text-slate-500 mt-2 text-base md:text-xl font-medium">The latest stories and updates from our communities.</p>
             </AnimatedSection>
-            <Link to="/blog" className="flex items-center gap-3 font-black uppercase tracking-[0.2em] text-brand-navy dark:text-white hover:text-brand-blue transition-all text-xs md:text-sm group shrink-0">
+            <Link to="/blog" className="ui-text-link group shrink-0">
               View All Blogs <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
             {recentPosts.map((post, index) => (
-              <AnimatedSection key={post.id} direction="up" delay={index * 0.1} className="group h-full bg-slate-50 dark:bg-slate-900 rounded-3xl overflow-hidden border border-slate-100 dark:border-white/5 shadow-sm hover:shadow-xl transition-all duration-500">
+              <AnimatedSection key={post.id} direction="up" delay={index * 0.1} className="group h-full bg-slate-50 dark:bg-slate-900 ui-card overflow-hidden border border-slate-100 dark:border-white/5 shadow-sm hover:shadow-xl transition-all duration-500">
                 <article className="flex flex-col h-full">
-                  <Link to={`/blog/${post.id}`} aria-label={`Read ${post.title}`} className="block h-56 overflow-hidden relative shrink-0">
+                  <Link to={`/blog/${post.id}`} aria-label={`Read ${post.title}`} className="block ui-card-media h-56 relative shrink-0">
                     <BlogCover post={post} />
-                    <span className="absolute top-4 left-4 bg-brand-green text-white text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-lg shadow-sm">
+                    <span className="absolute top-4 left-4 bg-brand-green text-white ui-badge shadow-sm">
                       {post.category}
                     </span>
                   </Link>
@@ -131,7 +131,7 @@ const Home: React.FC = () => {
                     <p className="text-slate-500 dark:text-slate-400 text-sm md:text-base font-medium mb-5 line-clamp-3 leading-relaxed">
                       {post.excerpt}
                     </p>
-                    <Link to={`/blog/${post.id}`} className="inline-flex items-center gap-2 text-brand-blue font-black uppercase tracking-widest hover:text-brand-navy dark:hover:text-white text-[11px] mt-auto">
+                    <Link to={`/blog/${post.id}`} className="ui-text-link mt-auto">
                       Read Article <ArrowRight size={16} />
                     </Link>
                   </div>
@@ -170,7 +170,7 @@ const Home: React.FC = () => {
                   key={i}
                   direction="right"
                   delay={i * 0.1}
-                  className={`p-6 md:p-7 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-white/5 shadow-sm hover:shadow-lg transition-all duration-300 ${i === 2 ? 'md:col-span-2' : ''}`}
+                  className={`p-6 md:p-7 ui-card bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-white/5 shadow-sm hover:shadow-lg transition-all duration-300 ${i === 2 ? 'md:col-span-2' : ''}`}
                 >
                   <div className="flex flex-col h-full">
                     <Quote className="text-brand-blue mb-4" size={24} fill="currentColor" />
@@ -214,7 +214,7 @@ const Home: React.FC = () => {
 const FAQItem: React.FC<{ question: string, answer: string, index: number }> = ({ question, answer, index }) => {
   const [isOpen, setIsOpen] = useState(false);
   return (
-    <AnimatedSection direction="right" delay={index * 0.1} className="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden border border-slate-100 dark:border-white/5 hover:shadow-lg transition-all duration-300">
+    <AnimatedSection direction="right" delay={index * 0.1} className="bg-white dark:bg-slate-900 ui-card overflow-hidden border border-slate-100 dark:border-white/5 hover:shadow-lg transition-all duration-300">
       <button onClick={() => setIsOpen(!isOpen)} aria-expanded={isOpen} aria-controls={`faq-answer-${index}`} className="w-full flex items-center justify-between p-5 md:p-6 text-left group">
         <span className="text-base md:text-lg font-black text-brand-navy dark:text-white group-hover:text-brand-blue transition-colors leading-tight pr-4 tracking-tight">{question}</span>
         <span className={`w-8 h-8 md:w-10 md:h-10 shrink-0 rounded-xl bg-slate-50 dark:bg-white/10 text-brand-blue shadow-sm transition-all duration-500 flex items-center justify-center ${isOpen ? 'rotate-180 bg-brand-blue text-white' : ''}`}>

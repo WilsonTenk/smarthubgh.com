@@ -24,11 +24,11 @@ const Blog: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
            {sortBlogsNewestFirst(blogData).map((post, index) => (
-             <AnimatedSection key={post.id} direction="up" delay={index * 0.1} className="bg-white dark:bg-slate-900 rounded-3xl overflow-hidden border border-gray-100 dark:border-white/5 shadow-sm hover:shadow-xl transition-all duration-500 flex flex-col h-full">
-                <div className="h-56 overflow-hidden relative">
+             <AnimatedSection key={post.id} direction="up" delay={index * 0.1} className="bg-white dark:bg-slate-900 ui-card overflow-hidden border border-gray-100 dark:border-white/5 shadow-sm hover:shadow-xl transition-all duration-500 flex flex-col h-full">
+                <div className="ui-card-media h-56 relative">
                    <BlogCover post={post} />
                    <div className="absolute top-4 left-4">
-                      <span className="bg-brand-green text-white text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-lg shadow-sm">
+                      <span className="bg-brand-green text-white ui-badge shadow-sm">
                         {post.category}
                       </span>
                    </div>
@@ -46,7 +46,7 @@ const Blog: React.FC = () => {
                    <p className="text-gray-500 dark:text-slate-400 text-sm md:text-base font-medium mb-5 line-clamp-3 leading-relaxed transition-colors">
                      {post.excerpt}
                    </p>
-                   <Link to={`/blog/${post.id}`} className="inline-flex items-center gap-2 text-brand-blue font-black uppercase tracking-widest hover:text-brand-navy dark:hover:text-white text-[11px] mt-auto">
+                   <Link to={`/blog/${post.id}`} className="ui-text-link mt-auto">
                      Read Article <ArrowRight size={16} />
                    </Link>
                 </div>

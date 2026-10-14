@@ -1,6 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowUpRight, ArrowRight } from 'lucide-react';
+import { ActionLink } from './Action';
 import { projectsData } from '../data';
 import { getAssetPath } from '../utils/assetPath';
 import { getResponsiveImageProps } from '../utils/responsiveImage';
@@ -23,12 +22,8 @@ export const HomeHero: React.FC = () => (
       </h1>
       <p className="home-lead">We connect young people across Ghana with the knowledge, care and opportunities to shape their own futures.</p>
       <div className="home-actions">
-        <Link to="/contact" className="home-button home-button-primary">
-          Donate now <span className="home-button-icon"><ArrowUpRight size={19} aria-hidden="true" /></span>
-        </Link>
-        <Link to="/contact" className="home-button home-button-secondary">
-          Get involved <span className="home-button-icon"><ArrowRight size={19} aria-hidden="true" /></span>
-        </Link>
+        <ActionLink to="/contact">Donate now</ActionLink>
+        <ActionLink to="/contact" variant="secondary">Get involved</ActionLink>
       </div>
     </div>
 
@@ -62,9 +57,7 @@ export const HomeStory: React.FC = () => (
         </div>
         <div className="home-story-copy">
           <p>From community conversations to classrooms, SMART Hub helps children, adolescents and young people build healthier, more confident futures. Our work brings together education, menstrual health, digital skills and leadership across Ghana.</p>
-          <Link to="/about" className="home-button home-button-primary">
-            Get to know SMART Hub <span className="home-button-icon"><ArrowUpRight size={19} aria-hidden="true" /></span>
-          </Link>
+          <ActionLink to="/about">Get to know SMART Hub</ActionLink>
         </div>
       </div>
       <div className="home-story-media">

@@ -27,11 +27,11 @@ const Projects: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
           {sortProjectsNewestFirst(projectsData).map((project, index) => (
             <AnimatedSection key={project.id} direction="up" delay={index * 0.1} className="h-full">
-              <div className="group bg-white dark:bg-slate-900 rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-white/5 flex flex-col h-full">
-                <div className="relative overflow-hidden h-52 md:h-64">
+              <div className="group bg-white dark:bg-slate-900 ui-card overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-white/5 flex flex-col h-full">
+                <div className="ui-card-media relative h-52 md:h-64">
                    <BlogCover post={project} />
                    <div className="absolute top-4 left-4">
-                      <span className="bg-brand-blue text-white text-[9px] md:text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-lg shadow-lg">
+                      <span className="bg-brand-blue text-white ui-badge shadow-lg">
                         {project.sponsor}
                       </span>
                    </div>
@@ -56,7 +56,7 @@ const Projects: React.FC = () => {
                    </p>
                    <Link 
                     to={`/projects/${project.id}`} 
-                    className="inline-flex items-center gap-2 text-brand-blue font-black text-xs md:text-sm uppercase tracking-widest hover:text-brand-navy dark:hover:text-white transition-colors mt-auto"
+                    className="ui-text-link mt-auto"
                    >
                      View Details <ArrowRight size={16} />
                    </Link>

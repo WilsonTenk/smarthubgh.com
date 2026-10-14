@@ -1,4 +1,5 @@
 @import "tailwindcss" source(none);
+@import "./components/DesignSystem.css";
 @config "./tailwind.config.cjs";
 @source "./App.tsx";
 @source "./components";

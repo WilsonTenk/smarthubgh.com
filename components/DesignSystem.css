@@ -1,0 +1,66 @@
+/* Shared atoms use the homepage's colours, pill actions and rounded surfaces. */
+:root {
+  --ui-blue: #0055ff;
+  --ui-ink: #0b1121;
+  --ui-border: #dce4f4;
+  --ui-media-surface: #dce4f4;
+  --ui-card-radius: 24px;
+  --ui-media-radius: 16px;
+  --ui-control-radius: 999px;
+}
+.dark { --ui-border: #26334b; --ui-media-surface: #111b2e; }
+.ui-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 23px;
+  padding: 7px 8px 7px 19px;
+  border: 1px solid transparent;
+  border-radius: var(--ui-control-radius);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.5;
+  text-transform: none;
+  letter-spacing: normal;
+  text-decoration: none;
+  vertical-align: middle;
+  flex-shrink: 0;
+  transition: transform .2s, background-color .2s, box-shadow .2s;
+}
+.ui-button:hover { transform: translateY(-2px); box-shadow: 0 5px 16px rgb(0 85 255 / 15%); }
+.ui-button:focus-visible, .ui-icon-button:focus-visible, .ui-text-link:focus-visible, .ui-profile-trigger:focus-visible {
+  outline: 3px solid var(--ui-blue); outline-offset: 5px;
+}
+.ui-button-primary { color: #fff; background: var(--ui-blue); }
+.ui-button-primary:hover { background: #0347d5; }
+.ui-button-secondary { color: var(--ui-ink); background: #fff; border-color: var(--ui-border); }
+.ui-button-icon { display: flex; width: 31px; height: 31px; align-items: center; justify-content: center; border-radius: 50%; flex: none; }
+.ui-button-primary .ui-button-icon { color: var(--ui-blue); background: #fff; }
+.ui-button-secondary .ui-button-icon { color: #fff; background: var(--ui-ink); }
+.ui-button:disabled { opacity: .6; cursor: not-allowed; transform: none; box-shadow: none; }
+.ui-icon-button { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; padding: 8px; border-radius: 50%; color: var(--ui-ink); background: transparent; transition: background-color .2s; flex-shrink: 0; }
+.ui-icon-button:hover { background: rgb(11 17 33 / 5%); }
+.dark .ui-icon-button { color: #fff; }
+.dark .ui-icon-button:hover { background: rgb(255 255 255 / 10%); }
+.ui-icon-button-overlay { color: #fff; background: var(--ui-ink); }
+.ui-icon-button-overlay:hover, .dark .ui-icon-button-overlay:hover { background: var(--ui-blue); }
+.ui-text-link { display: inline-flex; align-items: center; gap: 8px; width: fit-content; color: var(--ui-blue); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .1em; line-height: 1.5; transition: color .2s; }
+.ui-text-link:hover { color: var(--ui-ink); }
+.dark .ui-text-link:hover { color: #fff; }
+.ui-text-link-light { color: #fff; }
+.ui-text-link-light:hover { color: #c8d8ff; }
+.ui-card { border-radius: var(--ui-card-radius); }
+.ui-media { overflow: hidden; border-radius: var(--ui-media-radius); background: var(--ui-media-surface); }
+.ui-card-media { overflow: hidden; background: var(--ui-media-surface); }
+.ui-badge { display: inline-flex; align-items: center; gap: 6px; border-radius: 8px; padding: 7px 13px; font-size: 10px; font-weight: 700; letter-spacing: .035em; line-height: 1.3; text-transform: uppercase; }
+.ui-icon-placeholder { display: flex; align-items: center; justify-content: center; flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%; background: #e7efff; color: var(--ui-blue); }
+.dark .ui-icon-placeholder { background: #111b2e; color: #fff; }
+.ui-image-placeholder { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 24px; text-align: center; color: var(--ui-ink); background: var(--ui-media-surface); }
+.dark .ui-image-placeholder { color: #fff; }
+.ui-profile-trigger { display: block; width: 100%; text-align: center; border-radius: var(--ui-media-radius); }
+.portrait-frame { position: relative; width: 100%; aspect-ratio: 3 / 4; border: 1px solid var(--ui-border); }
+.portrait-frame img { position: absolute; inset: 12px; display: block; width: calc(100% - 24px); height: calc(100% - 24px); object-fit: contain; object-position: center; }
+.portrait-frame-profile { flex-shrink: 0; width: min(240px, 24svh); margin: 16px auto 0; }
+@media (min-width: 768px) { .portrait-frame-profile { width: 40%; max-width: 280px; margin: 16px; align-self: center; } }
+@media (max-width: 540px) { .ui-button { gap: 13px; font-size: 12px; padding-left: 15px; } }
+@media (prefers-reduced-motion: reduce) { .ui-button { transition: none; } .ui-button:hover { transform: none; } }

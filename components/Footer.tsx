@@ -3,6 +3,7 @@ import React from 'react';
 import { Facebook, Instagram, Linkedin, Mail, Phone, MapPin, ArrowUpRight, Heart } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import BrandLogo from './BrandLogo';
+import { ActionAnchor, ActionButton } from './Action';
 
 const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
@@ -36,16 +37,7 @@ const Footer: React.FC = () => {
 
             <div className="flex flex-wrap gap-3">
               {socialLinks.map((social) => (
-                <a
-                  key={social.name}
-                  href={social.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group flex items-center gap-2 px-4 py-3 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl hover:bg-brand-blue hover:border-brand-blue dark:hover:bg-brand-blue transition-all duration-300"
-                >
-                  <span className="text-brand-navy dark:text-white group-hover:text-white transition-colors">{social.icon}</span>
-                  <span className="text-[10px] font-black uppercase tracking-widest text-brand-navy dark:text-white group-hover:text-white transition-colors">{social.name}</span>
-                </a>
+                <ActionAnchor key={social.name} href={social.url} target="_blank" rel="noopener noreferrer" icon={social.icon}>{social.name}</ActionAnchor>
               ))}
             </div>
           </div>
@@ -131,15 +123,7 @@ const Footer: React.FC = () => {
             <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">
               © {currentYear} SMART HUB GH
             </p>
-            <button
-              onClick={() => window.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' })}
-              className="text-[10px] font-black uppercase tracking-widest text-brand-navy dark:text-white hover:text-brand-blue transition-colors flex items-center gap-2 group"
-            >
-              Back to Top
-              <span className="w-6 h-6 rounded-full bg-slate-200 dark:bg-white/10 flex items-center justify-center group-hover:bg-brand-blue group-hover:text-white transition-all">
-                ↑
-              </span>
-            </button>
+            <ActionButton variant="secondary" icon={<ArrowUpRight size={19} />} onClick={() => window.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' })}>Back to Top</ActionButton>
           </div>
         </div>
 

@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { ActionLink } from '../components/Action';
 import { AnimatedSection } from '../components/AnimatedSection';
 import { ArrowLeft, Calendar, Users, MapPin, Award } from 'lucide-react';
 import { projectsData } from '../data';
@@ -15,7 +16,7 @@ const ProjectDetail: React.FC = () => {
     return (
       <div className="min-h-screen bg-brand-light dark:bg-brand-navy flex items-center justify-center flex-col gap-4">
         <h1 className="font-display text-4xl text-brand-navy dark:text-white">Project Not Found</h1>
-        <Link to="/projects" className="text-brand-blue underline font-display uppercase tracking-widest">Back to Projects</Link>
+        <ActionLink to="/projects" variant="secondary" icon={<ArrowLeft size={19} />}>Back to Projects</ActionLink>
       </div>
     );
   }
@@ -31,7 +32,7 @@ const ProjectDetail: React.FC = () => {
         </div>
         <div className="relative w-full px-4 sm:px-8 lg:px-12 pt-32 md:pt-40 pb-8 lg:pb-12">
           <div className="max-w-7xl mx-auto">
-            <Link to="/projects" className="inline-flex items-center gap-2 text-white/80 hover:text-brand-green mb-6 transition-colors font-display uppercase tracking-widest text-sm">
+            <Link to="/projects" className="ui-text-link ui-text-link-light mb-6">
               <ArrowLeft size={16} /> Back to Projects
             </Link>
             <h1 className="font-display text-5xl md:text-7xl text-white uppercase leading-tight mb-4 tracking-tighter">
@@ -47,11 +48,11 @@ const ProjectDetail: React.FC = () => {
 
           {/* Sidebar / Metadata */}
           <div className="lg:col-span-1">
-            <AnimatedSection direction="up" className="bg-brand-light dark:bg-slate-900/50 p-6 md:p-7 rounded-2xl sticky top-24 border border-slate-100 dark:border-white/5 transition-colors">
+            <AnimatedSection direction="up" className="bg-brand-light dark:bg-slate-900/50 p-6 md:p-7 ui-card sticky top-24 border border-slate-100 dark:border-white/5 transition-colors">
               <h3 className="font-display text-2xl uppercase mb-6 text-brand-navy dark:text-white border-b border-gray-200 dark:border-white/10 pb-4 tracking-tight">Project Data</h3>
               <div className="space-y-6">
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-full bg-white dark:bg-white/10 flex items-center justify-center text-brand-green shrink-0 shadow-sm">
+                  <div className="ui-icon-placeholder">
                     <Calendar size={20} />
                   </div>
                   <div>
@@ -60,7 +61,7 @@ const ProjectDetail: React.FC = () => {
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-full bg-white dark:bg-white/10 flex items-center justify-center text-brand-green shrink-0 shadow-sm">
+                  <div className="ui-icon-placeholder">
                     <Award size={20} />
                   </div>
                   <div>
@@ -69,7 +70,7 @@ const ProjectDetail: React.FC = () => {
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-full bg-white dark:bg-white/10 flex items-center justify-center text-brand-green shrink-0 shadow-sm">
+                  <div className="ui-icon-placeholder">
                     <Users size={20} />
                   </div>
                   <div>
@@ -78,7 +79,7 @@ const ProjectDetail: React.FC = () => {
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-full bg-white dark:bg-white/10 flex items-center justify-center text-brand-green shrink-0 shadow-sm">
+                  <div className="ui-icon-placeholder">
                     <MapPin size={20} />
                   </div>
                   <div>
@@ -97,7 +98,7 @@ const ProjectDetail: React.FC = () => {
               <div className="text-gray-600 dark:text-slate-400 font-medium leading-relaxed space-y-6 text-base md:text-xl transition-colors">
                 <p>{project.fullContent || project.description}</p>
                 {project.relatedBlogId && (
-                  <Link to={`/blog/${project.relatedBlogId}`} className="inline-flex items-center gap-2 text-brand-blue font-black hover:underline">
+                  <Link to={`/blog/${project.relatedBlogId}`} className="ui-text-link">
                     Read the full project story
                   </Link>
                 )}
@@ -133,7 +134,7 @@ const ProjectDetail: React.FC = () => {
                   delay={Math.min(i * 0.08, 0.6)}
                   className="break-inside-avoid"
                 >
-                  <div className="relative group rounded-2xl overflow-hidden border-2 border-white/10 hover:border-brand-green/50 transition-all duration-500">
+                  <div className="ui-media relative group border-2 border-white/10 hover:border-brand-green/50 transition-all duration-500">
                     <img
                       {...getResponsiveImageProps(img, project.galleryImages!.length === 1 ? '(min-width: 1024px) 896px, 100vw' : '(min-width: 1280px) 300px, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw')}
                       alt={img === project.image && project.imageAlt ? project.imageAlt : `${project.title} - Photo ${i + 1}`}
