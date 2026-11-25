@@ -50,7 +50,7 @@ try {
   }).join('\n');
   await writeFile(path.join(outDir,'sitemap.xml'),`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemap}\n</urlset>\n`);
   const preview = process.env.VITE_NOINDEX === 'true';
-  await writeFile(path.join(outDir,'robots.txt'),preview?'User-agent: *\nDisallow: /\n':`User-agent: *\nAllow: /\nSitemap: ${renderer.SITE_URL}/sitemap.xml\n`);
+  await writeFile(path.join(outDir,'robots.txt'),preview?'User-agent: *\nDisallow: /\n':`User-agent: *\nAllow: /\nDisallow: /admin\nSitemap: ${renderer.SITE_URL}/sitemap.xml\n`);
   const base=process.env.VITE_BASE_PATH || '/';
   const htaccess=(await readFile(path.join(root,'public/.htaccess'),'utf8')).replaceAll('__CSP__',`${policy}; frame-ancestors 'self'`).replaceAll('__BASE__',base);
   await writeFile(path.join(outDir,'.htaccess'),htaccess);

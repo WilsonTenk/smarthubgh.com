@@ -6,13 +6,21 @@ require __DIR__ . '/_lib.php';
  * One-time setup: copies the website's current content (seed.json, made from
  * data.ts at build time) into the data folder and creates the first admin
  * account. It refuses to run again once an admin exists.
+ *
+ * Resetting a lost password: deleting users.json.php alone is not enough, because
+ * anyone could then claim the admin. Setup only reopens on a site that already has
+ * content when an "allow-setup.txt" file also exists in the data folder (create it
+ * in cPanel File Manager). The file is removed once the new admin is created.
  */
 
 $installed = count(sh_read('users')) > 0;
+$flags = [sh_data_dir() . DIRECTORY_SEPARATOR . 'allow-setup.txt', sh_data_dir() . DIRECTORY_SEPARATOR . 'allow-setup'];
+$unlocked = (bool) array_filter($flags, 'is_file');
+$needsUnlock = !$installed && sh_exists('content') && !$unlocked;
 $message = '';
 $done = false;
 
-if (!$installed && ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
+if (!$installed && !$needsUnlock && ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
     $username = trim((string) ($_POST['username'] ?? ''));
     $password = (string) ($_POST['password'] ?? '');
     if (!preg_match('/^[A-Za-z0-9_.@-]{3,64}$/', $username)) {
@@ -33,6 +41,7 @@ if (!$installed && ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
             $users[$username] = password_hash($password, PASSWORD_DEFAULT);
             return true;
         });
+        if ($created) foreach ($flags as $flag) @unlink($flag);
         $installed = true;
         $done = $created;
         $message = !$created ? 'An admin account already exists.'
@@ -42,6 +51,7 @@ if (!$installed && ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
 
 header('Content-Type: text/html; charset=utf-8');
 header('Cache-Control: no-store');
+header('X-Robots-Tag: noindex, nofollow');
 $e = fn(string $s) => htmlspecialchars($s, ENT_QUOTES, 'UTF-8');
 ?><!doctype html>
 <html lang="en">
@@ -63,6 +73,11 @@ button,a.btn{display:inline-block;margin-top:24px;background:#0055ff;color:#fff;
   <?php if ($message): ?><p class="msg <?= $done ? 'ok' : '' ?>"><?= $e($message) ?></p><?php endif; ?>
   <p>This setup page is now locked. Sign in to manage the website.</p>
   <a class="btn" href="/admin">Go to the admin</a>
+<?php elseif ($needsUnlock): ?>
+  <h1>Setup is locked</h1>
+  <p>This site already has content, so setup only reopens when you allow it. To create a new admin account,
+     open cPanel File Manager, go to the admin data folder and create an empty file named
+     <strong>allow-setup.txt</strong>. Then reload this page.</p>
 <?php else: ?>
   <h1>Set up the SMART Hub admin</h1>
   <p>This copies the website's current content into the admin and creates your admin account. No database is needed.</p>

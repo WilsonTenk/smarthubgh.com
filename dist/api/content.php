@@ -22,4 +22,5 @@ foreach (SH_COLLECTIONS as $collection) {
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: public, max-age=30');
 header('X-Content-Type-Options: nosniff');
+header('X-Robots-Tag: noindex, nofollow');
 echo json_encode($content, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

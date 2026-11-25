@@ -33,11 +33,15 @@ if ($action === 'login') {
     });
     if ($recent >= 8) sh_fail(429, 'Too many attempts. Try again in 15 minutes.');
 
-    $username = trim((string) ($body['username'] ?? ''));
-    $password = (string) ($body['password'] ?? '');
+    $username = is_string($body['username'] ?? null) ? trim($body['username']) : '';
+    $password = is_string($body['password'] ?? null) ? $body['password'] : '';
     $hash = sh_read('users')[$username] ?? null;
-    if (!is_string($hash) || !password_verify($password, $hash)) {
+    // Always run one password check, so a wrong username takes as long as a wrong password
+    // and response times don't reveal which usernames exist.
+    $valid = password_verify($password, is_string($hash) ? $hash : '$2y$10$abcdefghijklmnopqrstuuJ0r8u6M5Gm1r2s3t4u5v6w7x8y9z0AB');
+    if (!is_string($hash) || !$valid) {
         sh_update('attempts', [], function (array &$attempts) use ($ip) { $attempts[$ip][] = time(); });
+        usleep(random_int(700000, 1200000));   // Slows password guessing spread across many addresses.
         sh_fail(401, 'Wrong username or password.');
     }
     sh_update('attempts', [], function (array &$attempts) use ($ip) { unset($attempts[$ip]); });
