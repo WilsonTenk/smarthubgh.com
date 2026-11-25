@@ -54,3 +54,6 @@ smarthub-config.php
 smarthub-data/
 public/uploads/
 dist/uploads/
+
+# PHP writes error_log next to the script on cPanel; never commit it (it also blocks Git deploys)
+error_log
