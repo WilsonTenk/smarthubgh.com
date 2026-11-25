@@ -52,3 +52,28 @@ export interface BlogPost {
   author: string;
   category: string;
 }
+
+export interface GalleryImage {
+  id: string;
+  src: string;
+  alt: string;
+  caption?: string;
+}
+
+export interface SiteSettings {
+  email: string;
+  phonePrimary: string;
+  phoneSecondary?: string;
+  addressLine1: string;
+  addressLine2?: string;
+  digitalAddress?: string;
+}
+
+export interface SiteContent {
+  projects: Project[];
+  blog: BlogPost[];
+  partners: Partner[];
+  leadership: LeadershipMember[];
+  gallery: GalleryImage[];
+  settings: SiteSettings;
+}

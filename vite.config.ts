@@ -7,6 +7,8 @@ export default defineConfig({
     server: {
       port: 3000,
       host: '127.0.0.1',
+      // Local admin testing: run 'php -S 127.0.0.1:8000 -t dist' after a build.
+      proxy: { '/api': 'http://127.0.0.1:8000', '/uploads': 'http://127.0.0.1:8000' },
     },
     plugins: [react()],
     build: {

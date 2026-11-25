@@ -1,4 +1,4 @@
-import { blogData, projectsData } from '../data';
+import { getContent } from './content';
 
 export const SITE_NAME = 'SMART HUB GH';
 export const SITE_URL = (import.meta.env.VITE_SITE_URL || 'https://smarthubgh.com').replace(/\/+$/, '');
@@ -44,8 +44,8 @@ const defaultImage = absoluteUrl('/SMART-HUB-LOGO-ORIGINAL.png');
 export function getSeoRoutes(): string[] {
   return [
     '/', '/about', '/projects', '/gallery', '/blog', '/contact',
-    ...projectsData.map(project => `/projects/${project.id}`),
-    ...blogData.map(post => `/blog/${post.id}`)
+    ...getContent().projects.map(project => `/projects/${project.id}`),
+    ...getContent().blog.map(post => `/blog/${post.id}`)
   ];
 }
 
@@ -112,8 +112,8 @@ function breadcrumbs(path: string, label: string): StructuredData {
 export function getPageSeo(pathname: string): PageSeo {
   const path = normalizePathname(pathname);
   const standard = standardPages[path];
-  const project = projectsData.find(item => path === `/projects/${item.id}`);
-  const post = blogData.find(item => path === `/blog/${item.id}`);
+  const project = getContent().projects.find(item => path === `/projects/${item.id}`);
+  const post = getContent().blog.find(item => path === `/blog/${item.id}`);
   const known = Boolean(standard || project || post);
   const title = standard?.title || (project ? `${project.title} | SMART Hub Projects` : post ? `${post.title} | SMART Hub Blog` : 'Page Not Found | SMART Hub GH');
   const description = conciseDescription(standard?.description || project?.description || post?.excerpt || 'The requested page could not be found. Explore SMART Hub projects, stories, and community activities.');
@@ -157,7 +157,7 @@ export function getPageSeo(pathname: string): PageSeo {
         ...(modified ? { dateModified: modified } : {})
       });
     } else {
-      const list = path === '/projects' ? projectsData.map(item => ({ name: item.title, url: canonicalUrl(`/projects/${item.id}`) })) : path === '/blog' ? blogData.map(item => ({ name: item.title, url: canonicalUrl(`/blog/${item.id}`) })) : undefined;
+      const list = path === '/projects' ? getContent().projects.map(item => ({ name: item.title, url: canonicalUrl(`/projects/${item.id}`) })) : path === '/blog' ? getContent().blog.map(item => ({ name: item.title, url: canonicalUrl(`/blog/${item.id}`) })) : undefined;
       schemas.push({
         '@context': 'https://schema.org',
         '@type': standard?.collection ? 'CollectionPage' : 'WebPage',

@@ -4,16 +4,19 @@ import { useParams, Link } from 'react-router-dom';
 import { ActionButton, ActionLink } from '../components/Action';
 import { AnimatedSection } from '../components/AnimatedSection';
 import { ArrowLeft, Calendar, User, Tag } from 'lucide-react';
-import { blogData } from '../data';
+import { useContent, useContentReady } from '../utils/content';
 import BlogCover from '../components/BlogCover';
 import { getImageDimensions } from '../utils/imageDimensions';
 import { getResponsiveImageProps } from '../utils/responsiveImage';
 
 const BlogPost: React.FC = () => {
+  const { blog: blogData } = useContent();
+  const contentReady = useContentReady();
   const { id } = useParams<{ id: string }>();
   const post = blogData.find(p => p.id === id);
 
   if (!post) {
+    if (!contentReady) return <div className="min-h-screen bg-brand-light dark:bg-brand-navy" aria-busy="true" />;
     return (
       <div className="min-h-screen bg-brand-light dark:bg-brand-navy flex items-center justify-center flex-col gap-4 transition-colors">
         <h1 className="text-4xl font-black text-brand-navy dark:text-white">Article Not Found</h1>

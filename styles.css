@@ -4,6 +4,7 @@
 @source "./App.tsx";
 @source "./components";
 @source "./pages";
+@source "./admin";
 @custom-variant dark (&:where(.dark, .dark *));
 
 @layer base {

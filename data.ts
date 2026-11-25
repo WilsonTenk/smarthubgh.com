@@ -1,4 +1,4 @@
-import { Project, BlogPost, Partner, LeadershipMember } from './types';
+import { Project, BlogPost, Partner, LeadershipMember, GalleryImage, SiteSettings } from './types';
 import { getAssetPath } from './utils/assetPath';
 
 export const projectsData: Project[] = [
@@ -385,3 +385,15 @@ export const leadershipData: LeadershipMember[] = [
     bio: "I am a Physician Assistant and youth advocate passionate about promoting health education and empowering young people to make informed decisions about their wellbeing. Through my work with SmartHub I actively educate adolescents and communities on menstrual hygiene, sexual and reproductive health rights, and general health awareness. I am committed to advancing youth development, gender equality, and access to accurate health information. My goal is to bridge the gap between healthcare and community education by creating safe spaces for learning, dialogue, and positive behavioral change that supports healthier and more empowered communities."
   }
 ];
+
+// Photos added from the admin panel that are not tied to a project.
+export const galleryData: GalleryImage[] = [];
+
+export const siteSettings: SiteSettings = {
+  email: "admin@smarthubgh.com",
+  phonePrimary: "+233 20 437 4782",
+  phoneSecondary: "+233 59 409 7370",
+  addressLine1: "Daglama Street, Near Mirage,",
+  addressLine2: "Ho, Volta Region. AJ552",
+  digitalAddress: "VH-0109-9423"
+};

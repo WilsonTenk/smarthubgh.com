@@ -48,3 +48,9 @@ askpass.sh
 push.sh
 push_chunked.sh
 deploy_ghpages.sh
+
+# Admin: database credentials, local database and uploaded images
+smarthub-config.php
+*.sqlite
+public/uploads/
+dist/uploads/

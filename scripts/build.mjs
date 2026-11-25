@@ -55,6 +55,8 @@ try {
   const htaccess=(await readFile(path.join(root,'public/.htaccess'),'utf8')).replaceAll('__CSP__',`${policy}; frame-ancestors 'self'`).replaceAll('__BASE__',base);
   await writeFile(path.join(outDir,'.htaccess'),htaccess);
   await writeFile(path.join(outDir,'.nojekyll'),'');
+  // The admin setup page imports this snapshot of data.ts into the database.
+  await writeFile(path.join(outDir,'api/seed.json'),JSON.stringify(renderer.getContent(),null,2)+'\n');
   console.log(`Prerendered ${renderer.getSeoRoutes().length} pages, sitemap, robots and security rules.`);
 } finally {await server.close();}
 

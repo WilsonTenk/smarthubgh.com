@@ -1,11 +1,13 @@
 
 import React from 'react';
+import { useContent } from '../utils/content';
 import { Facebook, Instagram, Linkedin, Mail, Phone, MapPin, ArrowUpRight, Heart } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import BrandLogo from './BrandLogo';
 import { ActionAnchor, ActionButton } from './Action';
 
 const Footer: React.FC = () => {
+  const { settings } = useContent();
   const currentYear = new Date().getFullYear();
 
   const socialLinks = [
@@ -76,8 +78,7 @@ const Footer: React.FC = () => {
                   <span className="text-[10px] font-black uppercase tracking-widest">Head Office</span>
                 </div>
                 <p className="text-brand-navy dark:text-white font-bold leading-snug group-hover:text-brand-blue transition-colors">
-                  Daglama Street, Near Mirage, <br />
-                  Ho, Volta Region. AJ552
+                  {settings.addressLine1}{settings.addressLine2 && <><br />{settings.addressLine2}</>}
                 </p>
               </div>
 
@@ -87,8 +88,7 @@ const Footer: React.FC = () => {
                   <span className="text-[10px] font-black uppercase tracking-widest">Hotline</span>
                 </div>
                 <p className="text-brand-navy dark:text-white font-bold leading-snug group-hover:text-brand-blue transition-colors">
-                  +233 20 437 4782 <br />
-                  +233 59 409 7370
+                  {settings.phonePrimary}{settings.phoneSecondary && <><br />{settings.phoneSecondary}</>}
                 </p>
               </div>
 
@@ -97,8 +97,8 @@ const Footer: React.FC = () => {
                   <Mail size={18} />
                   <span className="text-[10px] font-black uppercase tracking-widest">Email Us</span>
                 </div>
-                <a href="mailto:admin@smarthubgh.com" className="text-brand-navy dark:text-white font-bold leading-snug hover:text-brand-blue transition-colors block border-b border-slate-200 dark:border-white/10 pb-1">
-                  admin@smarthubgh.com
+                <a href={`mailto:${settings.email}`} className="text-brand-navy dark:text-white font-bold leading-snug hover:text-brand-blue transition-colors block border-b border-slate-200 dark:border-white/10 pb-1">
+                  {settings.email}
                 </a>
               </div>
             </div>
