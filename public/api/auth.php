@@ -6,6 +6,7 @@ $method = sh_method('GET', 'POST');
 sh_session();
 
 if ($method === 'GET') {
+    if (!sh_exists('users')) sh_fail(503, 'The admin has not been set up yet.');
     sh_json(['user' => $_SESSION['user'] ?? null, 'csrf' => sh_csrf()]);
 }
 
@@ -19,23 +20,27 @@ if ($action === 'logout') {
 }
 
 if ($action === 'login') {
-    $db = sh_db();
     $ip = substr($_SERVER['REMOTE_ADDR'] ?? 'unknown', 0, 64);
-    $db->prepare('DELETE FROM sh_login_attempts WHERE attempted_at < ?')->execute([time() - 15 * 60]);
-    $count = $db->prepare('SELECT COUNT(*) FROM sh_login_attempts WHERE ip = ?');
-    $count->execute([$ip]);
-    if ((int) $count->fetchColumn() >= 8) sh_fail(429, 'Too many attempts. Try again in 15 minutes.');
+    $window = time() - 15 * 60;
+
+    // Keep only recent failures; allow 8 per address per 15 minutes.
+    $recent = sh_update('attempts', [], function (array &$attempts) use ($ip, $window) {
+        foreach ($attempts as $key => $times) {
+            $attempts[$key] = array_values(array_filter((array) $times, fn($t) => $t >= $window));
+            if (!$attempts[$key]) unset($attempts[$key]);
+        }
+        return count($attempts[$ip] ?? []);
+    });
+    if ($recent >= 8) sh_fail(429, 'Too many attempts. Try again in 15 minutes.');
 
     $username = trim((string) ($body['username'] ?? ''));
     $password = (string) ($body['password'] ?? '');
-    $find = $db->prepare('SELECT password_hash FROM sh_users WHERE username = ?');
-    $find->execute([$username]);
-    $hash = $find->fetchColumn();
-    if (!$hash || !password_verify($password, $hash)) {
-        $db->prepare('INSERT INTO sh_login_attempts (ip, attempted_at) VALUES (?, ?)')->execute([$ip, time()]);
+    $hash = sh_read('users')[$username] ?? null;
+    if (!is_string($hash) || !password_verify($password, $hash)) {
+        sh_update('attempts', [], function (array &$attempts) use ($ip) { $attempts[$ip][] = time(); });
         sh_fail(401, 'Wrong username or password.');
     }
-    $db->prepare('DELETE FROM sh_login_attempts WHERE ip = ?')->execute([$ip]);
+    sh_update('attempts', [], function (array &$attempts) use ($ip) { unset($attempts[$ip]); });
     session_regenerate_id(true);
     $_SESSION['user'] = $username;
     $_SESSION['csrf'] = bin2hex(random_bytes(32));
@@ -46,10 +51,11 @@ if ($action === 'password') {
     $user = sh_require_admin();
     $next = (string) ($body['next'] ?? '');
     if (strlen($next) < 10) sh_fail(422, 'The new password must be at least 10 characters.');
-    $find = sh_db()->prepare('SELECT password_hash FROM sh_users WHERE username = ?');
-    $find->execute([$user]);
-    if (!password_verify((string) ($body['current'] ?? ''), (string) $find->fetchColumn())) sh_fail(422, 'Your current password is wrong.');
-    sh_db()->prepare('UPDATE sh_users SET password_hash = ? WHERE username = ?')->execute([password_hash($next, PASSWORD_DEFAULT), $user]);
+    $current = (string) ($body['current'] ?? '');
+    sh_update('users', [], function (array &$users) use ($user, $current, $next) {
+        if (!password_verify($current, (string) ($users[$user] ?? ''))) sh_fail(422, 'Your current password is wrong.');
+        $users[$user] = password_hash($next, PASSWORD_DEFAULT);
+    });
     sh_json(['ok' => true]);
 }
 

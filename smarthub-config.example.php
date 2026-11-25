@@ -1,15 +1,13 @@
 <?php
-// Copy this file to smarthub-config.php and fill in your database details.
-// On cPanel put it in your home folder (for example /home/twinkleh/smarthub-config.php),
-// outside public_html. The API looks for it in the parent folders of dist/api.
-// Never commit smarthub-config.php to Git.
+// OPTIONAL. The admin works without this file.
+//
+// By default the admin stores its data (content, admin logins, failed sign-ins)
+// as JSON files in a "smarthub-data" folder next to dist/, which is outside the
+// website's document root. To keep the data somewhere else, copy this file to
+// smarthub-config.php (in the project folder or any folder above dist/) and set
+// data_dir. Never commit smarthub-config.php to Git.
 
 return [
-    // cPanel > MySQL Databases: create a database and a user, and give the user ALL PRIVILEGES on it.
-    'dsn' => 'mysql:host=localhost;dbname=twinkleh_smarthub;charset=utf8mb4',
-    'db_user' => 'twinkleh_smarthub',
-    'db_pass' => 'change-me',
-
-    // For local testing without MySQL you can use SQLite instead:
-    // 'dsn' => 'sqlite:' . __DIR__ . '/smarthub-local.sqlite',
+    // For example a folder in your cPanel home, outside public_html:
+    'data_dir' => '/home/twinkleh/smarthub-data',
 ];

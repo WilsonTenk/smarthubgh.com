@@ -4,33 +4,38 @@ require __DIR__ . '/_lib.php';
 
 $method = sh_method('GET', 'POST', 'DELETE');
 sh_require_admin();
-$db = sh_db();
 
 $collection = (string) ($_GET['collection'] ?? '');
 if (!in_array($collection, SH_COLLECTIONS, true)) sh_fail(400, 'Unknown collection.');
 
-function sh_list(string $collection): array {
-    $stmt = sh_db()->prepare('SELECT data FROM sh_items WHERE collection = ? ORDER BY position, id');
-    $stmt->execute([$collection]);
-    return array_map(fn($row) => json_decode($row['data'], true), $stmt->fetchAll());
-}
+$empty = array_fill_keys(SH_COLLECTIONS, []);
+$list = fn(array $content) => array_values(array_filter($content[$collection] ?? [], 'is_array'));
 
-if ($method === 'GET') sh_json(['items' => sh_list($collection)]);
+if ($method === 'GET') sh_json(['items' => $list(sh_read('content', $empty))]);
 
 if ($method === 'DELETE') {
-    $db->prepare('DELETE FROM sh_items WHERE collection = ? AND id = ?')->execute([$collection, (string) ($_GET['id'] ?? '')]);
-    sh_json(['items' => sh_list($collection)]);
+    $id = (string) ($_GET['id'] ?? '');
+    $items = sh_update('content', $empty, function (array &$content) use ($collection, $id, $list) {
+        $content[$collection] = array_values(array_filter($list($content), fn($item) => ($item['id'] ?? '') !== $id));
+        return $content[$collection];
+    });
+    sh_json(['items' => $items]);
 }
 
 $body = sh_body();
 
-// Reorder: {"order": ["id-a", "id-b", ...]}
+// Reorder: {"order": ["id-a", "id-b", ...]}. Items missing from the list keep their place at the end.
 if (isset($body['order']) && is_array($body['order'])) {
-    $update = $db->prepare('UPDATE sh_items SET position = ? WHERE collection = ? AND id = ?');
-    $db->beginTransaction();
-    foreach (array_values($body['order']) as $position => $id) $update->execute([$position, $collection, (string) $id]);
-    $db->commit();
-    sh_json(['items' => sh_list($collection)]);
+    $order = array_flip(array_map('strval', array_values($body['order'])));
+    $items = sh_update('content', $empty, function (array &$content) use ($collection, $order, $list) {
+        $items = $list($content);
+        $rank = fn($item, $index) => $order[$item['id'] ?? ''] ?? (count($order) + $index);
+        $ranked = array_map(fn($item, $index) => [$rank($item, $index), $item], $items, array_keys($items));
+        usort($ranked, fn($a, $b) => $a[0] <=> $b[0]);
+        $content[$collection] = array_column($ranked, 1);
+        return $content[$collection];
+    });
+    sh_json(['items' => $items]);
 }
 
 // Save one item: {"item": {...}, "originalId": "id-before-editing" | null}
@@ -43,28 +48,29 @@ $id = $collection === 'settings'
     ? 'site'
     : sh_slug((string) ($item['id'] ?? '') !== '' ? (string) $item['id'] : (string) ($clean['title'] ?? $clean['name'] ?? $clean['caption'] ?? ''));
 $originalId = isset($body['originalId']) && $body['originalId'] !== '' ? (string) $body['originalId'] : null;
+$saved = ['id' => $id] + $clean;
 
-$positionOf = $db->prepare('SELECT position FROM sh_items WHERE collection = ? AND id = ?');
-$positionOf->execute([$collection, $id]);
-$position = $positionOf->fetchColumn();
-if ($position !== false && $originalId !== $id && $collection !== 'settings') {
-    sh_fail(409, 'Another entry already uses the ID "' . $id . '". Change the title or the ID.');
-}
+$items = sh_update('content', $empty, function (array &$content) use ($collection, $id, $originalId, $saved, $list) {
+    $items = $list($content);
+    $ids = array_map(fn($entry) => (string) ($entry['id'] ?? ''), $items);
+    $taken = array_search($id, $ids, true);
 
-$db->beginTransaction();
-if ($originalId !== null && $originalId !== $id) {
-    // The ID (web address) changed: keep the old position, remove the old row.
-    $positionOf->execute([$collection, $originalId]);
-    $position = $positionOf->fetchColumn();
-    $db->prepare('DELETE FROM sh_items WHERE collection = ? AND id = ?')->execute([$collection, $originalId]);
-}
-if ($position === false || $position === null) {
-    // New entries go to the top of the list.
-    $min = $db->prepare('SELECT MIN(position) FROM sh_items WHERE collection = ?');
-    $min->execute([$collection]);
-    $position = ((int) $min->fetchColumn()) - 1;
-}
-sh_store($collection, $id, (int) $position, $clean);
-$db->commit();
+    if ($collection === 'settings') {
+        $content['settings'] = [$saved];
+        return $content['settings'];
+    }
+    if ($taken !== false && $originalId !== $id) {
+        sh_fail(409, 'Another entry already uses the web address "' . $id . '". Change the title or the web address.');
+    }
 
-sh_json(['item' => ['id' => $id] + $clean, 'items' => sh_list($collection)]);
+    $at = $originalId !== null ? array_search($originalId, $ids, true) : false;
+    if ($at !== false) {
+        $items[$at] = $saved;            // Edit in place, even if the web address changed.
+    } else {
+        array_unshift($items, $saved);   // New entries go to the top of the list.
+    }
+    $content[$collection] = array_values($items);
+    return $content[$collection];
+});
+
+sh_json(['item' => $saved, 'items' => $items]);
