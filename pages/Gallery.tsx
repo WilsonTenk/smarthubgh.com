@@ -1,7 +1,7 @@
 
 import React, { useMemo } from 'react';
 import { AnimatedSection } from '../components/AnimatedSection';
-import { projectsData } from '../data';
+import { useContent } from '../utils/content';
 import { getResponsiveImageProps } from '../utils/responsiveImage';
 
 // A build seed keeps the initial server and browser photo order identical.
@@ -23,6 +23,7 @@ function shuffleArray<T>(arr: T[]): T[] {
 }
 
 const Gallery: React.FC = () => {
+  const { projects: projectsData, gallery } = useContent();
   // Collect all images — thumbnail + gallery images for every project
   const allImages = useMemo(() => {
     const imgs: { src: string; caption: string; alt: string }[] = [];
@@ -33,8 +34,10 @@ const Gallery: React.FC = () => {
       }
     });
     // Keep this arrangement stable throughout hydration and subsequent rendering.
-    return shuffleArray(imgs);
-  }, []);
+    // Photos added in the admin panel appear first.
+    const uploaded = gallery.map(g => ({ src: g.src, caption: g.caption || "", alt: g.alt || g.caption || "SMART Hub photo" }));
+    return [...uploaded, ...shuffleArray(imgs)];
+  }, [projectsData, gallery]);
 
   return (
     <div className="bg-white dark:bg-brand-navy min-h-screen transition-colors duration-300">

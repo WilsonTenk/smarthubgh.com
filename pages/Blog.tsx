@@ -3,11 +3,12 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { AnimatedSection } from '../components/AnimatedSection';
 import { ArrowRight, Calendar, User } from 'lucide-react';
-import { blogData } from '../data';
+import { useContent } from '../utils/content';
 import BlogCover from '../components/BlogCover';
 import { sortBlogsNewestFirst } from '../utils/contentOrder';
 
 const Blog: React.FC = () => {
+  const { blog: blogData } = useContent();
   return (
     <div className="bg-brand-light dark:bg-brand-navy min-h-screen transition-colors duration-300">
       <div className="bg-brand-navy text-white pt-32 md:pt-40 pb-16 px-4">

@@ -1,6 +1,6 @@
 import React from 'react';
 import { ActionLink } from './Action';
-import { projectsData } from '../data';
+import { useContent } from '../utils/content';
 import { getAssetPath } from '../utils/assetPath';
 import { getResponsiveImageProps } from '../utils/responsiveImage';
 import RotatingFocusWord from './RotatingFocusWord';
@@ -47,7 +47,9 @@ export const HomeHero: React.FC = () => (
   </section>
 );
 
-export const HomeStory: React.FC = () => (
+export const HomeStory: React.FC = () => {
+  const { projects: projectsData } = useContent();
+  return (
   <section id="our-story" className="home-story" aria-labelledby="home-story-heading">
     <div className="home-story-card">
       <div className="home-story-intro">
@@ -72,4 +74,5 @@ export const HomeStory: React.FC = () => (
       </div>
     </div>
   </section>
-);
+  );
+};

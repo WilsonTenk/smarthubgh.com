@@ -13,6 +13,12 @@ ErrorDocument 404 __BASE__404.html
   RewriteCond %{HTTPS} !=on
   RewriteCond %{HTTP:X-Forwarded-Proto} !https [NC]
   RewriteRule ^ https://smarthubgh.com%{REQUEST_URI} [R=301,L,NE]
+
+  # The admin, and blog posts or projects added in the admin, have no prerendered
+  # page. Serve the app shell, which loads their content from the API.
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^(?:admin(?:/.*)?|blog/[^/]+/?|projects/[^/]+/?)$ __BASE__404.html [L]
 </IfModule>
 
 <IfModule mod_headers.c>
@@ -38,6 +44,6 @@ ErrorDocument 404 __BASE__404.html
 </IfModule>
 
 # Deployment contains public build files only; also deny common source/secret names.
-<FilesMatch "(?i)^(?:\..*|package(?:-lock)?\.json|.*\.(?:pem|key|map)|vite\.config\..*|tsconfig\.json)$">
+<FilesMatch "(?i)^(?:\..*|_.*\.php|smarthub-config.*|.*\.sqlite|package(?:-lock)?\.json|.*\.(?:pem|key|map)|vite\.config\..*|tsconfig\.json)$">
   Require all denied
 </FilesMatch>

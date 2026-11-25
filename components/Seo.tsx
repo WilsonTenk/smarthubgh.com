@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+import { useContent } from '../utils/content';
 import { getPageSeo, serializeJsonLd, SITE_NAME } from '../utils/seo';
 
 function setMeta(attribute: 'name' | 'property', key: string, content?: string): void {
@@ -17,6 +18,7 @@ function setMeta(attribute: 'name' | 'property', key: string, content?: string):
 
 const Seo = (): null => {
   const { pathname } = useLocation();
+  const content = useContent();
 
   useEffect(() => {
     const seo = getPageSeo(pathname);
@@ -60,7 +62,7 @@ const Seo = (): null => {
     } else {
       existingSchema?.remove();
     }
-  }, [pathname]);
+  }, [pathname, content]);
 
   return null;
 };

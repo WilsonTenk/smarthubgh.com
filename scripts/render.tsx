@@ -8,3 +8,4 @@ export function render(pathname: string) {
   const location = `${base === '/' ? '' : base}${pathname}`;
   return renderToString(<StaticRouter basename={base} location={location}><AppContent /></StaticRouter>);
 }
+export { getContent } from '../utils/content';

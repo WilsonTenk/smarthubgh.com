@@ -4,15 +4,18 @@ import { useParams, Link } from 'react-router-dom';
 import { ActionLink } from '../components/Action';
 import { AnimatedSection } from '../components/AnimatedSection';
 import { ArrowLeft, Calendar, Users, MapPin, Award } from 'lucide-react';
-import { projectsData } from '../data';
+import { useContent, useContentReady } from '../utils/content';
 import BlogCover from '../components/BlogCover';
 import { getResponsiveImageProps } from '../utils/responsiveImage';
 
 const ProjectDetail: React.FC = () => {
+  const { projects: projectsData } = useContent();
+  const contentReady = useContentReady();
   const { id } = useParams<{ id: string }>();
   const project = projectsData.find(p => p.id === id);
 
   if (!project) {
+    if (!contentReady) return <div className="min-h-screen bg-brand-light dark:bg-brand-navy" aria-busy="true" />;
     return (
       <div className="min-h-screen bg-brand-light dark:bg-brand-navy flex items-center justify-center flex-col gap-4">
         <h1 className="font-display text-4xl text-brand-navy dark:text-white">Project Not Found</h1>
@@ -96,7 +99,7 @@ const ProjectDetail: React.FC = () => {
             <AnimatedSection direction="up" delay={0.2}>
               <h2 className="text-3xl md:text-4xl font-black uppercase text-brand-navy dark:text-white mb-8 tracking-tighter">Overview</h2>
               <div className="text-gray-600 dark:text-slate-400 font-medium leading-relaxed space-y-6 text-base md:text-xl transition-colors">
-                <p>{project.fullContent || project.description}</p>
+                {(project.fullContent || project.description).split(/\n\s*\n/).map((paragraph, index) => <p key={index}>{paragraph}</p>)}
                 {project.relatedBlogId && (
                   <Link to={`/blog/${project.relatedBlogId}`} className="ui-text-link">
                     Read the full project story

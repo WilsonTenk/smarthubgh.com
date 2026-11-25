@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Calendar, Minus, Plus, Quote } from 'lucide-react';
 import { AnimatedSection } from '../components/AnimatedSection';
 import BlogCover from '../components/BlogCover';
-import { blogData, projectsData } from '../data';
+import { useContent } from '../utils/content';
 import { HomeHero, HomeStory } from '../components/HomeHero';
 import { sortBlogsNewestFirst, sortProjectsNewestFirst } from '../utils/contentOrder';
 
@@ -27,6 +27,7 @@ const testimonials = [
 ];
 
 const Home: React.FC = () => {
+  const { blog: blogData, projects: projectsData } = useContent();
   const featuredProjects = sortProjectsNewestFirst(projectsData).slice(0, 2);
   const recentPosts = sortBlogsNewestFirst(blogData).slice(0, 3);
   const faqs = [

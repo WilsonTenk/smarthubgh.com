@@ -15,6 +15,10 @@ import BlogPost from './pages/BlogPost';
 import Contact from './pages/Contact';
 import Seo from './components/Seo';
 import NotFound from './pages/NotFound';
+import { loadLiveContent } from './utils/content';
+
+// The admin panel is a separate chunk, so public visitors never download it.
+const AdminApp = React.lazy(() => import('./admin/AdminApp'));
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -28,6 +32,21 @@ const ScrollToTop = () => {
 
 export const AppContent: React.FC = () => {
   const reduceMotion = usePrefersReducedMotion();
+  const { pathname } = useLocation();
+  const isAdmin = /^\/admin(?:\/|$)/.test(pathname);
+
+  React.useEffect(() => {
+    if (!isAdmin) loadLiveContent();
+  }, [isAdmin]);
+
+  if (isAdmin) {
+    return (
+      <React.Suspense fallback={<div className="min-h-screen bg-slate-100" />}>
+        <AdminApp />
+      </React.Suspense>
+    );
+  }
+
   return (
     <MotionConfig reducedMotion={reduceMotion ? 'always' : 'never'}>
         <Seo />

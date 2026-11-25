@@ -4,7 +4,7 @@ import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePrefersReducedMotion } from '../utils/usePrefersReducedMotion';
 import { AnimatedSection } from '../components/AnimatedSection';
-import { leadershipData, partnersData } from '../data';
+import { useContent } from '../utils/content';
 import { Users, Globe, Layers, CheckCircle2, X } from 'lucide-react';
 import { LeadershipMember } from '../types';
 import PortraitFrame from '../components/PortraitFrame';
@@ -13,6 +13,7 @@ import CountUp from '../components/CountUp';
 import PartnerMarquee from '../components/PartnerMarquee';
 
 const About: React.FC = () => {
+  const { leadership: leadershipData, partners: partnersData } = useContent();
   const [selectedLeader, setSelectedLeader] = useState<LeadershipMember | null>(null);
   const reduceMotion = usePrefersReducedMotion();
   const dialogRef = useRef<HTMLDivElement>(null);

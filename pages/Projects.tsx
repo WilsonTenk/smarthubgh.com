@@ -3,11 +3,12 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { AnimatedSection } from '../components/AnimatedSection';
 import { Calendar, Users, ArrowRight } from 'lucide-react';
-import { projectsData } from '../data';
+import { useContent } from '../utils/content';
 import BlogCover from '../components/BlogCover';
 import { sortProjectsNewestFirst } from '../utils/contentOrder';
 
 const Projects: React.FC = () => {
+  const { projects: projectsData } = useContent();
   return (
     <div className="bg-brand-light dark:bg-brand-navy min-h-screen transition-colors duration-300">
       

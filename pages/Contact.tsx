@@ -1,9 +1,11 @@
 
 import React from 'react';
+import { useContent } from '../utils/content';
 import { AnimatedSection } from '../components/AnimatedSection';
 import { Phone, Mail, MapPin, Heart } from 'lucide-react';
 
 const Contact: React.FC = () => {
+  const { settings } = useContent();
   return (
     <div className="bg-brand-light dark:bg-brand-navy min-h-screen transition-colors duration-300">
       
@@ -72,8 +74,8 @@ const Contact: React.FC = () => {
                   </div>
                   <div>
                     <h3 className="font-black text-sm md:text-base text-brand-navy dark:text-white uppercase tracking-widest mb-1 transition-colors">Location</h3>
-                    <p className="text-gray-500 dark:text-slate-400 text-sm md:text-lg leading-tight font-medium transition-colors">Daglama Street, Near Mirage, Ho. AJ552</p>
-                    <p className="text-brand-blue/50 text-[9px] font-black mt-2 uppercase tracking-widest">VH-0109-9423</p>
+                    <p className="text-gray-500 dark:text-slate-400 text-sm md:text-lg leading-tight font-medium transition-colors">{[settings.addressLine1, settings.addressLine2].filter(Boolean).join(" ")}</p>
+                    {settings.digitalAddress && <p className="text-brand-blue/50 text-[9px] font-black mt-2 uppercase tracking-widest">{settings.digitalAddress}</p>}
                   </div>
                 </div>
 
@@ -83,8 +85,8 @@ const Contact: React.FC = () => {
                   </div>
                   <div>
                     <h3 className="font-black text-sm md:text-base text-brand-navy dark:text-white uppercase tracking-widest mb-1 transition-colors">Contact</h3>
-                    <p className="text-gray-500 dark:text-slate-400 text-sm md:text-lg leading-tight font-medium transition-colors">+233 20 437 4782</p>
-                    <p className="text-gray-500 dark:text-slate-400 text-sm md:text-lg leading-tight font-medium transition-colors">+233 59 409 7370</p>
+                    <p className="text-gray-500 dark:text-slate-400 text-sm md:text-lg leading-tight font-medium transition-colors">{settings.phonePrimary}</p>
+                    {settings.phoneSecondary && <p className="text-gray-500 dark:text-slate-400 text-sm md:text-lg leading-tight font-medium transition-colors">{settings.phoneSecondary}</p>}
                   </div>
                 </div>
 
@@ -94,8 +96,8 @@ const Contact: React.FC = () => {
                   </div>
                   <div className="min-w-0">
                     <h3 className="font-black text-sm md:text-base text-brand-navy dark:text-white uppercase tracking-widest mb-1 transition-colors">Email</h3>
-                    <a href="mailto:admin@smarthubgh.com" className="text-gray-500 dark:text-slate-400 text-sm md:text-lg break-words hover:text-brand-blue transition-colors font-medium border-b border-transparent hover:border-brand-blue">
-                      admin@smarthubgh.com
+                    <a href={`mailto:${settings.email}`} className="text-gray-500 dark:text-slate-400 text-sm md:text-lg break-words hover:text-brand-blue transition-colors font-medium border-b border-transparent hover:border-brand-blue">
+                      {settings.email}
                     </a>
                   </div>
                 </div>
