@@ -69,7 +69,15 @@ await Promise.all(Array.from({length:2},async()=>{
     const input=path.join(root,'public/images',name), output=path.join(outDir,'images',name);
     let image=sharp(input).rotate().resize({width:1600,height:1600,fit:'inside',withoutEnlargement:true});
     image=/\.png$/i.test(name)?image.png({compressionLevel:9}):image.jpeg({quality:85});
-    await writeFile(output,await image.toBuffer());
+    const data=await image.toBuffer();
+    // Windows antivirus/indexing can briefly lock a file Vite just copied; retry instead of failing the build.
+    for(let attempt=1;;attempt++){
+      try{await writeFile(output,data);break;}
+      catch(error){
+        if(attempt>=8||!['UNKNOWN','EBUSY','EPERM','EACCES'].includes(error.code)) throw error;
+        await new Promise(resolve=>setTimeout(resolve,150*attempt));
+      }
+    }
   }
 }));
 await rm(path.join(outDir,'media/.image-cache.json'),{force:true});

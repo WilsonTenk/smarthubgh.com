@@ -49,8 +49,8 @@ push.sh
 push_chunked.sh
 deploy_ghpages.sh
 
-# Admin: database credentials, local database and uploaded images
+# Admin: private data folder, optional config and uploaded images
 smarthub-config.php
-*.sqlite
+smarthub-data/
 public/uploads/
 dist/uploads/

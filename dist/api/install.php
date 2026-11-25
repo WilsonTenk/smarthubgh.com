@@ -3,14 +3,12 @@ declare(strict_types=1);
 require __DIR__ . '/_lib.php';
 
 /*
- * One-time setup: creates the tables, imports the website's current content
- * from seed.json and creates the first admin account. It refuses to run again
- * once an admin exists.
+ * One-time setup: copies the website's current content (seed.json, made from
+ * data.ts at build time) into the data folder and creates the first admin
+ * account. It refuses to run again once an admin exists.
  */
 
-sh_create_tables();
-$db = sh_db();
-$installed = (int) $db->query('SELECT COUNT(*) FROM sh_users')->fetchColumn() > 0;
+$installed = count(sh_read('users')) > 0;
 $message = '';
 $done = false;
 
@@ -24,28 +22,21 @@ if (!$installed && ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
     } elseif ($password !== (string) ($_POST['confirm'] ?? '')) {
         $message = 'The two passwords do not match.';
     } else {
-        $seed = is_file(__DIR__ . '/seed.json') ? json_decode((string) file_get_contents(__DIR__ . '/seed.json'), true) : null;
-        $db->beginTransaction();
         $imported = 0;
-        $hasContent = (int) $db->query('SELECT COUNT(*) FROM sh_items')->fetchColumn() > 0;
-        if (is_array($seed) && !$hasContent) {
-            foreach (SH_COLLECTIONS as $collection) {
-                $items = $collection === 'settings' ? (isset($seed['settings']) ? [$seed['settings']] : []) : ($seed[$collection] ?? []);
-                foreach (array_values($items) as $position => $item) {
-                    if (!is_array($item)) continue;
-                    $clean = sh_clean($collection, $item, false);
-                    unset($clean['id']);
-                    $id = $collection === 'settings' ? 'site' : sh_slug((string) ($item['id'] ?? $item['title'] ?? $item['name'] ?? $item['caption'] ?? ''));
-                    sh_store($collection, $id, $position, $clean);
-                    $imported++;
-                }
-            }
+        if (!sh_exists('content')) {
+            $content = sh_seed_content();
+            $imported = array_sum(array_map('count', $content));
+            sh_write('content', $content);
         }
-        $db->prepare('INSERT INTO sh_users (username, password_hash) VALUES (?, ?)')->execute([$username, password_hash($password, PASSWORD_DEFAULT)]);
-        $db->commit();
+        $created = sh_update('users', [], function (array &$users) use ($username, $password) {
+            if ($users) return false;   // Someone finished setup a moment earlier.
+            $users[$username] = password_hash($password, PASSWORD_DEFAULT);
+            return true;
+        });
         $installed = true;
-        $done = true;
-        $message = $imported ? "Imported $imported items from the current website." : 'No content was imported (the database already had content, or seed.json was missing).';
+        $done = $created;
+        $message = !$created ? 'An admin account already exists.'
+            : ($imported ? "Imported $imported items from the current website." : 'Your existing content was kept.');
     }
 }
 
@@ -58,12 +49,12 @@ $e = fn(string $s) => htmlspecialchars($s, ENT_QUOTES, 'UTF-8');
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex">
 <title>SMART Hub admin setup</title>
 <style>
-body{font-family:system-ui,sans-serif;background:#f1f5f9;color:#0f172a;display:grid;place-items:center;min-height:100vh;margin:0;padding:16px}
+body{font-family:system-ui,sans-serif;background:#f6f7fb;color:#0f172a;display:grid;place-items:center;min-height:100vh;margin:0;padding:16px}
 main{background:#fff;border-radius:16px;padding:32px;max-width:420px;width:100%;box-shadow:0 10px 30px rgba(15,23,42,.08)}
 h1{font-size:22px;margin:0 0 8px}p{color:#475569;line-height:1.5}label{display:block;font-weight:600;font-size:14px;margin:16px 0 6px}
-input{width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid #cbd5e1;border-radius:8px;font-size:16px}
-button,a.btn{display:inline-block;margin-top:24px;background:#0b1f3a;color:#fff;border:0;border-radius:8px;padding:12px 18px;font-size:15px;font-weight:600;text-decoration:none;cursor:pointer}
-.msg{background:#fef3c7;border-radius:8px;padding:10px 12px;color:#78350f}.ok{background:#dcfce7;color:#14532d}
+input{width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid #cbd5e1;border-radius:10px;font-size:16px}
+button,a.btn{display:inline-block;margin-top:24px;background:#0055ff;color:#fff;border:0;border-radius:10px;padding:12px 18px;font-size:15px;font-weight:600;text-decoration:none;cursor:pointer}
+.msg{background:#fef3c7;border-radius:10px;padding:10px 12px;color:#78350f}.ok{background:#dcfce7;color:#14532d}
 </style>
 </head>
 <body><main>
@@ -74,7 +65,7 @@ button,a.btn{display:inline-block;margin-top:24px;background:#0b1f3a;color:#fff;
   <a class="btn" href="/admin">Go to the admin</a>
 <?php else: ?>
   <h1>Set up the SMART Hub admin</h1>
-  <p>This creates the database tables, copies the website's current content into them, and creates your admin account.</p>
+  <p>This copies the website's current content into the admin and creates your admin account. No database is needed.</p>
   <?php if ($message): ?><p class="msg"><?= $e($message) ?></p><?php endif; ?>
   <form method="post" autocomplete="off">
     <label for="username">Admin username</label>

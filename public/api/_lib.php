@@ -3,48 +3,92 @@ declare(strict_types=1);
 
 /*
  * Shared helpers for the SMART Hub admin API.
- * Database credentials live in smarthub-config.php, which is searched for in
- * this folder's parents so it can sit outside the public web root.
+ *
+ * No database: everything is stored as JSON in a private data folder,
+ * by default "smarthub-data" next to dist/ (outside the website's document
+ * root). Each file starts with "<?php exit; ?>" and ends in .php, so even if
+ * the folder were ever reachable from the web, the server would run it and
+ * print nothing instead of showing its contents.
+ *
+ * Files: content.json.php (all site content), users.json.php (admin
+ * logins, hashed passwords only) and attempts.json.php (failed sign-ins).
  */
 
 if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === '_lib.php') { http_response_code(404); exit; }
 
 const SH_COLLECTIONS = ['projects', 'blog', 'partners', 'leadership', 'gallery', 'settings'];
+const SH_GUARD = "<?php exit; ?>\n";
 
+/** Optional smarthub-config.php (in this folder's parents) may set 'data_dir'. */
 function sh_config(): array {
     static $config = null;
     if ($config !== null) return $config;
-    $candidates = [];
-    if ($env = getenv('SMARTHUB_CONFIG')) $candidates[] = $env;
+    $config = [];
     $dir = __DIR__;
     for ($i = 0; $i < 6; $i++) {
-        $candidates[] = $dir . DIRECTORY_SEPARATOR . 'smarthub-config.php';
+        $file = $dir . DIRECTORY_SEPARATOR . 'smarthub-config.php';
+        if (is_file($file)) { $loaded = require $file; $config = is_array($loaded) ? $loaded : []; break; }
         $parent = dirname($dir);
         if ($parent === $dir) break;
         $dir = $parent;
     }
-    foreach ($candidates as $file) {
-        if (is_file($file)) { $config = require $file; return $config; }
-    }
-    sh_fail(500, 'The admin is not configured yet. Create smarthub-config.php (see smarthub-config.example.php).');
+    return $config;
 }
 
-function sh_db(): PDO {
-    static $pdo = null;
-    if ($pdo) return $pdo;
-    $c = sh_config();
+function sh_data_dir(): string {
+    static $dir = null;
+    if ($dir !== null) return $dir;
+    $dir = rtrim((string) (getenv('SMARTHUB_DATA_DIR') ?: (sh_config()['data_dir'] ?? dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'smarthub-data')), '/\\');
+    if (!is_dir($dir) && !@mkdir($dir, 0750, true)) {
+        sh_fail(500, 'The admin data folder could not be created. Check that PHP can write to: ' . basename(dirname($dir)) . '/' . basename($dir));
+    }
+    $guard = $dir . DIRECTORY_SEPARATOR . '.htaccess';
+    if (!is_file($guard)) @file_put_contents($guard, "Require all denied\nOptions -Indexes\n");
+    $index = $dir . DIRECTORY_SEPARATOR . 'index.html';
+    if (!is_file($index)) @file_put_contents($index, '');
+    return $dir;
+}
+
+function sh_path(string $name): string { return sh_data_dir() . DIRECTORY_SEPARATOR . $name . '.json.php'; }
+
+function sh_exists(string $name): bool { return is_file(sh_path($name)); }
+
+function sh_read(string $name, $default = []) {
+    $file = sh_path($name);
+    if (!is_file($file)) return $default;
+    $raw = (string) file_get_contents($file);
+    if (str_starts_with($raw, SH_GUARD)) $raw = substr($raw, strlen(SH_GUARD));
+    $data = json_decode($raw, true);
+    return is_array($data) ? $data : $default;
+}
+
+/** Writes atomically: a temporary file is renamed over the old one. */
+function sh_write(string $name, array $data): void {
+    $file = sh_path($name);
+    $json = json_encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+    if ($json === false) sh_fail(500, 'The data could not be saved.');
+    $temp = $file . '.' . bin2hex(random_bytes(4)) . '.tmp';
+    if (file_put_contents($temp, SH_GUARD . $json, LOCK_EX) === false || !@rename($temp, $file)) {
+        @unlink($temp);
+        sh_fail(500, 'The data could not be saved. Check that PHP can write to the data folder.');
+    }
+    @chmod($file, 0640);
+}
+
+/** Runs $change on a file's data while holding a lock, so two saves can't overwrite each other. */
+function sh_update(string $name, $default, callable $change) {
+    $lock = fopen(sh_data_dir() . DIRECTORY_SEPARATOR . '.lock', 'c');
+    if (!$lock || !flock($lock, LOCK_EX)) sh_fail(500, 'The data folder is busy. Please try again.');
     try {
-        $pdo = new PDO($c['dsn'], $c['db_user'] ?? null, $c['db_pass'] ?? null, [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        ]);
-    } catch (PDOException $e) {
-        sh_fail(500, 'Could not connect to the database.');
+        $data = sh_read($name, $default);
+        $result = $change($data);
+        sh_write($name, $data);
+        return $result;
+    } finally {
+        flock($lock, LOCK_UN);
+        fclose($lock);
     }
-    return $pdo;
 }
-
-function sh_is_mysql(): bool { return sh_db()->getAttribute(PDO::ATTR_DRIVER_NAME) === 'mysql'; }
 
 function sh_json($data, int $status = 200): void {
     http_response_code($status);
@@ -90,33 +134,13 @@ function sh_csrf(): string {
 function sh_require_admin(): string {
     sh_session();
     if (empty($_SESSION['user'])) sh_fail(401, 'Please sign in.');
+    // A user removed from users.json.php loses access straight away.
+    if (!isset(sh_read('users')[$_SESSION['user']])) { $_SESSION = []; sh_fail(401, 'Please sign in.'); }
     $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
     if ($method !== 'GET' && !hash_equals($_SESSION['csrf'] ?? '', $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '')) {
         sh_fail(403, 'Your session expired. Reload the page and try again.');
     }
     return $_SESSION['user'];
-}
-
-function sh_create_tables(): void {
-    $text = sh_is_mysql() ? 'MEDIUMTEXT' : 'TEXT';
-    $suffix = sh_is_mysql() ? ' ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci' : '';
-    $db = sh_db();
-    $db->exec("CREATE TABLE IF NOT EXISTS sh_items (
-        collection VARCHAR(32) NOT NULL,
-        id VARCHAR(150) NOT NULL,
-        position INT NOT NULL DEFAULT 0,
-        data $text NOT NULL,
-        updated_at VARCHAR(32) NOT NULL,
-        PRIMARY KEY (collection, id)
-    )$suffix");
-    $db->exec("CREATE TABLE IF NOT EXISTS sh_users (
-        username VARCHAR(64) NOT NULL PRIMARY KEY,
-        password_hash VARCHAR(255) NOT NULL
-    )$suffix");
-    $db->exec("CREATE TABLE IF NOT EXISTS sh_login_attempts (
-        ip VARCHAR(64) NOT NULL,
-        attempted_at INT NOT NULL
-    )$suffix");
 }
 
 function sh_slug(string $value): string {
@@ -196,11 +220,23 @@ function sh_clean(string $collection, array $item, bool $strict = true): array {
     return $clean;
 }
 
-/** Inserts or replaces one stored item. */
-function sh_store(string $collection, string $id, int $position, array $item): void {
-    $db = sh_db();
-    $json = json_encode(['id' => $id] + $item, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-    $db->prepare('DELETE FROM sh_items WHERE collection = ? AND id = ?')->execute([$collection, $id]);
-    $db->prepare('INSERT INTO sh_items (collection, id, position, data, updated_at) VALUES (?, ?, ?, ?, ?)')
-       ->execute([$collection, $id, $position, $json, gmdate('c')]);
+/** Converts the build snapshot (seed.json) into stored content. */
+function sh_seed_content(): array {
+    $seed = is_file(__DIR__ . '/seed.json') ? json_decode((string) file_get_contents(__DIR__ . '/seed.json'), true) : null;
+    $content = array_fill_keys(SH_COLLECTIONS, []);
+    if (!is_array($seed)) return $content;
+    foreach (SH_COLLECTIONS as $collection) {
+        $items = $collection === 'settings' ? (isset($seed['settings']) ? [$seed['settings']] : []) : ($seed[$collection] ?? []);
+        $seen = [];
+        foreach ($items as $item) {
+            if (!is_array($item)) continue;
+            $clean = sh_clean($collection, $item, false);
+            unset($clean['id']);
+            $id = $collection === 'settings' ? 'site' : sh_slug((string) ($item['id'] ?? $item['title'] ?? $item['name'] ?? $item['caption'] ?? ''));
+            if (isset($seen[$id])) continue;
+            $seen[$id] = true;
+            $content[$collection][] = ['id' => $id] + $clean;
+        }
+    }
+    return $content;
 }

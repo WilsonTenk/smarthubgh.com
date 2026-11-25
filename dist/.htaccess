@@ -44,6 +44,6 @@ ErrorDocument 404 /404.html
 </IfModule>
 
 # Deployment contains public build files only; also deny common source/secret names.
-<FilesMatch "(?i)^(?:\..*|_.*\.php|smarthub-config.*|.*\.sqlite|package(?:-lock)?\.json|.*\.(?:pem|key|map)|vite\.config\..*|tsconfig\.json)$">
+<FilesMatch "(?i)^(?:\..*|_.*\.php|smarthub-config.*|.*\.json\.php|package(?:-lock)?\.json|.*\.(?:pem|key|map)|vite\.config\..*|tsconfig\.json)$">
   Require all denied
 </FilesMatch>
