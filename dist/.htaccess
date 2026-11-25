@@ -14,11 +14,16 @@ ErrorDocument 404 /404.html
   RewriteCond %{HTTP:X-Forwarded-Proto} !https [NC]
   RewriteRule ^ https://smarthubgh.com%{REQUEST_URI} [R=301,L,NE]
 
-  # The admin, and blog posts or projects added in the admin, have no prerendered
-  # page. Serve the app shell, which loads their content from the API.
+  # Blog posts and projects: api/page.php fills in each page's title, description,
+  # canonical link and social tags from the admin's saved content (keeping the
+  # prerendered body when there is one) and returns a real 404 for unknown pages.
+  RewriteRule ^(blog|projects)/([a-z0-9-]+)/?$ /api/page.php?type=$1&id=$2 [L,QSA]
+  # The sitemap lists everything saved in the admin, including new posts and projects.
+  RewriteRule ^sitemap\.xml$ /api/sitemap.php [L]
+  # The admin has no prerendered page; serve the app shell (marked noindex).
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteRule ^(?:admin(?:/.*)?|blog/[^/]+/?|projects/[^/]+/?)$ /404.html [L]
+  RewriteRule ^admin(?:/.*)?$ /404.html [L]
 </IfModule>
 
 <IfModule mod_headers.c>

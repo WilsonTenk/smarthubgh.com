@@ -95,6 +95,7 @@ function sh_json($data, int $status = 200): void {
     header('Content-Type: application/json; charset=utf-8');
     header('Cache-Control: no-store');
     header('X-Content-Type-Options: nosniff');
+    header('X-Robots-Tag: noindex, nofollow');
     echo json_encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     exit;
 }
@@ -108,6 +109,9 @@ function sh_method(string ...$allowed): string {
 }
 
 function sh_body(): array {
+    // Browsers can only send application/json cross-site after a CORS preflight, which this
+    // API never approves, so requiring it blocks forged requests from other websites.
+    if (stripos((string) ($_SERVER['CONTENT_TYPE'] ?? ''), 'application/json') !== 0) sh_fail(415, 'Expected a JSON request.');
     $data = json_decode(file_get_contents('php://input') ?: '', true);
     if (!is_array($data)) sh_fail(400, 'Invalid JSON body.');
     return $data;
@@ -188,6 +192,7 @@ function sh_clean(string $collection, array $item, bool $strict = true): array {
             $value = trim((string) $value);
             $max = $rule === 's' ? 500 : 200000;
             if (mb_strlen($value) > $max) sh_fail(422, "The field \"$field\" is too long.");
+            if (in_array($field, SH_HTML_FIELDS[$collection] ?? [], true)) $value = trim(sh_sanitize_html($value));
             if ($value === '') continue;
         } elseif ($rule === 'n') {
             if ($value === '' || !is_numeric($value)) continue;
@@ -218,6 +223,79 @@ function sh_clean(string $collection, array $item, bool $strict = true): array {
         }
     }
     return $clean;
+}
+
+/** Fields that the website renders as HTML; they are cleaned on every save. */
+const SH_HTML_FIELDS = ['blog' => ['content']];
+
+/**
+ * Keeps only safe formatting in article HTML: no scripts, frames, forms, styles,
+ * event handlers (onclick=…) or javascript: links. The site's Content Security
+ * Policy blocks scripts as well; this is a second layer.
+ */
+function sh_sanitize_html(string $html): string {
+    if (trim($html) === '') return '';
+    $allowed = [
+        'p' => [], 'br' => [], 'hr' => [], 'h2' => [], 'h3' => [], 'h4' => [], 'strong' => [], 'b' => [], 'em' => [], 'i' => [],
+        'u' => [], 's' => [], 'sub' => [], 'sup' => [], 'ul' => [], 'ol' => [], 'li' => [], 'blockquote' => [], 'span' => [],
+        'div' => [], 'figure' => [], 'figcaption' => [], 'a' => ['href', 'title', 'target', 'rel'], 'img' => ['src', 'alt', 'width', 'height'],
+    ];
+    $drop = ['script', 'style', 'iframe', 'frame', 'frameset', 'object', 'embed', 'applet', 'form', 'input', 'button', 'select',
+        'textarea', 'meta', 'link', 'base', 'svg', 'math', 'template', 'noscript', 'audio', 'video', 'source', 'track', 'canvas'];
+
+    if (!class_exists('DOMDocument')) {
+        // Fallback without the DOM extension: keep allowed tags, strip risky attributes.
+        $html = preg_replace('#<(' . implode('|', $drop) . ')\b[^>]*>.*?</\1\s*>#is', '', $html) ?? '';
+        $html = strip_tags($html, '<' . implode('><', array_keys($allowed)) . '>');
+        $html = preg_replace('/\s(on\w+|style|srcdoc|formaction)\s*=\s*("[^"]*"|\'[^\']*\'|[^\s>]+)/i', '', $html) ?? '';
+        return preg_replace('/(href|src)\s*=\s*(["\']?)\s*(javascript|vbscript|data):[^"\'>\s]*\2/i', '$1="#"', $html) ?? '';
+    }
+
+    $doc = new DOMDocument();
+    $previous = libxml_use_internal_errors(true);
+    $doc->loadHTML('<?xml encoding="utf-8"?><div id="sh-root">' . $html . '</div>', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | LIBXML_NONET);
+    libxml_clear_errors();
+    libxml_use_internal_errors($previous);
+    $root = $doc->getElementById('sh-root') ?? $doc->documentElement;
+    if (!$root) return '';
+
+    $safeUrl = function (string $url, bool $image): bool {
+        $url = trim(preg_replace('/[\x00-\x20]+/', '', $url) ?? '');
+        if ($url === '' || $url[0] === '/' || $url[0] === '#') return !str_starts_with($url, '//');
+        return (bool) preg_match($image ? '#^https?://#i' : '#^(https?:|mailto:|tel:)#i', $url);
+    };
+
+    $clean = function (DOMNode $node) use (&$clean, $allowed, $drop, $safeUrl): void {
+        foreach (iterator_to_array($node->childNodes) as $child) {
+            if ($child instanceof DOMComment || $child instanceof DOMProcessingInstruction) { $node->removeChild($child); continue; }
+            if (!$child instanceof DOMElement) continue;
+            $tag = strtolower($child->tagName);
+            if (in_array($tag, $drop, true)) { $node->removeChild($child); continue; }
+            $clean($child);
+            if (!isset($allowed[$tag])) {
+                // Unknown tag: keep its text and safe children, drop the tag itself.
+                while ($child->firstChild) $node->insertBefore($child->firstChild, $child);
+                $node->removeChild($child);
+                continue;
+            }
+            foreach (iterator_to_array($child->attributes) as $attribute) {
+                $name = strtolower($attribute->name);
+                $keep = in_array($name, $allowed[$tag], true);
+                if ($keep && ($name === 'href' || $name === 'src')) $keep = $safeUrl($attribute->value, $name === 'src');
+                if (!$keep) $child->removeAttribute($attribute->name);
+            }
+            if ($tag === 'img' && $child->getAttribute('src') === '') { $node->removeChild($child); continue; }
+            if ($tag === 'a' && $child->getAttribute('target') !== '') {
+                $child->setAttribute('target', '_blank');
+                $child->setAttribute('rel', 'noopener noreferrer');
+            }
+        }
+    };
+    $clean($root);
+
+    $out = '';
+    foreach ($root->childNodes as $child) $out .= $doc->saveHTML($child);
+    return $out;
 }
 
 /** Converts the build snapshot (seed.json) into stored content. */
